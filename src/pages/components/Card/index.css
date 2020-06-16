@@ -1,0 +1,19 @@
+.infobox {
+  position: absolute;
+  z-index: 1;
+  top: 20px;
+  padding: 15px;
+  color: #fff;
+  background-color: rgba(6, 64, 102, 0.8);
+  font-size: 14px;
+  border-radius: 4px;
+  border: 2px solid #ffffff;
+}
+
+.infoline {
+  width: 200px;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
