@@ -1,35 +1,43 @@
 import React, { Component } from 'react';
-import { Upload } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import { useRequest } from 'umi';
+import request from 'umi-request';
+import FileUpload from './FileUpload';
 import './index.css';
 
 // 刷新页面的随机取
 const items = ['良好', '破损'];
 const item = items[Math.floor(Math.random() * 2)];
+const url = '';
 
 class Card extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showDetail: this.props.showDetail
+      showDetail: this.props.showDetail,
+      result: false,
+      showUpload: true,
     };
   }
 
   componentDidMount() {
-    // fetch('http://113.31.105.181:8180/api/v1/get/picture/url', {
-		// 	method: 'POST',
-		// 	body: JSON.stringify({
-		// 		pic_id: this.props.id
-		// 	})
-		// })
-    //   .then(function(response) {
-		// 		console.log(response)
-    //     return response;
-		//   })
-		const { data, error, loading } = useRequest((services) => {
-			return services.getUserList('/api/v1/get/picture/url');
-		});
+    // 每点击一块玻璃，进行一次请求
+    const urlencoded = new URLSearchParams();
+    urlencoded.append('pic_id', this.props.id[0]);
+    request
+      .post('/api/v1/get/picture/url', {
+        data: urlencoded,
+      })
+      .then(function(response) {
+        console.log(response);
+        if (response.result == 'success') {
+          this.setState({
+            result: true,
+          });
+          this.response.url = url;
+        }
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
   }
 
   closeInfo = () => {
@@ -39,6 +47,8 @@ class Card extends Component {
   };
 
   render() {
+    // const { previewVisible, previewImage } = this.state;
+
     return (
       <div className="infobox" style={{ right: 20 }}>
         <div
@@ -74,17 +84,10 @@ class Card extends Component {
         </div>
         <div className="infoline">
           <span>图片：</span>
-          <img src={require('')}/>
+          {this.result ? <img src={require(url)} style={{width: '75%', height: '75%'}} /> : <img src={require('@/assets/good.jpg')} style={{width: '75%', height: '75%'}} />}
         </div>
         <div className="infoline">
-          <span>上传此次照片：</span>
-          <Upload
-            listType="picture-card"
-            // onPreview={this.handlePreview}
-            // onChange={this.handleChange}
-          >
-            上传图片
-          </Upload>
+          <FileUpload id={this.props.id} />
         </div>
         <div className="infoline">
           <span>详细信息：</span>

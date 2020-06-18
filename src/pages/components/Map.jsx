@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import * as Cesium from 'cesium';
-import Select from './Select/index';
+import Select from './FloorSelect/index';
 import Card from './Card/index';
 import 'cesium/Source/Widgets/widgets.css';
 
@@ -90,6 +90,7 @@ class Map extends Component {
     });
     // 隐藏页面控件
     viewer._cesiumWidget._creditContainer.style.display = 'none';
+    this.viewer = viewer;
     // 创建场景对象
     const scene = viewer.scene;
     this.scene = scene;
