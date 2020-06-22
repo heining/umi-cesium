@@ -91,7 +91,7 @@ class Map extends Component {
     // 隐藏页面控件
     viewer._cesiumWidget._creditContainer.style.display = 'none';
     this.viewer = viewer;
-    // 创建场景对象
+    // 创建场景对象 
     const scene = viewer.scene;
     this.scene = scene;
     // 添加贴图
@@ -99,6 +99,7 @@ class Map extends Component {
       url: 'http://cdn.lesuidao.cn/prds3/tileset.json',
       maximumScreenSpaceError: 2, //细化程度的最大屏幕空间错误（提高清晰度）
     });
+    this.prds = prds;
     prds.readyPromise
       .then(prds => {
         // 模型贴地
@@ -142,7 +143,7 @@ class Map extends Component {
   render() {
     return (
       <div id="cesiumContainer" style={{width: '100%', height: '100%', backgroundColor: 'black'}}>
-        <Select style={{position: 'absolute'}}/>
+        <Select style={{position: 'absolute'}} viewer={this.viewer} prds={this.prds} scene={this.scene}/>
         { this.state.showDetail ? <Card style={{position: 'absolute'}} id={this.state.id} /> : <div></div>}
       </div>
     );

@@ -21,7 +21,8 @@ class Card extends Component {
   componentDidMount() {
     // 每点击一块玻璃，进行一次请求
     const urlencoded = new URLSearchParams();
-    urlencoded.append('pic_id', this.props.id[0]);
+    urlencoded.append('pic_id', this.props.id);
+    urlencoded.append('title', 'pictest');
     request
       .post('/api/v1/get/picture/url', {
         data: urlencoded,
@@ -41,14 +42,13 @@ class Card extends Component {
   }
 
   closeInfo = () => {
+    console.log('执行该行')
     this.setState({
       showDetail: false,
     });
   };
 
   render() {
-    // const { previewVisible, previewImage } = this.state;
-
     return (
       <div className="infobox" style={{ right: 20 }}>
         <div
@@ -80,11 +80,11 @@ class Card extends Component {
         </div>
         <div className="infoline">
           <span>位置：</span>
-          <span>{this.props.id[0]}f前向左侧第3列</span>
+          <span>{this.props.id.substr(0, 1)}f前向左侧第3列</span>
         </div>
         <div className="infoline">
           <span>图片：</span>
-          {this.result ? <img src={require(url)} style={{width: '75%', height: '75%'}} /> : <img src={require('@/assets/good.jpg')} style={{width: '75%', height: '75%'}} />}
+          { this.state.result ? <img src={require(url)} style={{width: '75%', height: '75%'}} /> : <img src={require('@/assets/good.jpg')} style={{width: '75%', height: '75%'}} />}
         </div>
         <div className="infoline">
           <FileUpload id={this.props.id} />
