@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import request from 'umi-request';
 import FileUpload from './FileUpload';
+import History from './History';
+import Zmage from 'react-zmage';
+import QRCode from 'qrcode.react';
 import './index.css';
 
 // 刷新页面的随机取
@@ -12,10 +15,23 @@ class Card extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showDetail: this.props.showDetail,
+      showDetail: true,
       result: false,
       showUpload: true,
+      showHistory: false
     };
+  }
+
+  handleHistory = () => {
+    this.setState({
+      showHistory: true
+    })
+  }
+
+  closeHistory = () => {
+    this.setState({
+      showHistory: false
+    })
   }
 
   componentDidMount() {
@@ -41,19 +57,12 @@ class Card extends Component {
       });
   }
 
-  closeInfo = () => {
-    console.log('执行该行')
-    this.setState({
-      showDetail: false,
-    });
-  };
-
   render() {
     return (
       <div className="infobox" style={{ right: 20 }}>
         <div
           style={{ position: 'absolute', right: 15, top: 10, cursor: 'pointer' }}
-          onClick={this.closeInfo}
+          onClick={this.props.closeInfo}
         >
           X
         </div>
@@ -84,14 +93,30 @@ class Card extends Component {
         </div>
         <div className="infoline">
           <span>图片：</span>
-          { this.state.result ? <img src={require(url)} style={{width: '75%', height: '75%'}} /> : <img src={require('@/assets/good.jpg')} style={{width: '75%', height: '75%'}} />}
+          {this.state.result ? (
+            <Zmage src={require(url)} style={{ width: '75%', height: '75%' }} />
+          ) : (
+            <Zmage src={require('@/assets/good.jpg')} style={{ width: '75%', height: '75%' }} />
+          )}
+        </div>
+        <div className="infoline">
+          <a onClick={this.handleHistory}>历史图片</a>
+          { this.state.showHistory ? <History closeHistory={this.closeHistory}/> : <div></div>}
         </div>
         <div className="infoline">
           <FileUpload id={this.props.id} />
         </div>
         <div className="infoline">
           <span>详细信息：</span>
-          <span>手机扫码查看</span>
+          <div style={{ display: 'flex', justifyContent: 'center', width: 180, margin: 10 }}>
+            {/* 二维码 */}
+            <QRCode
+              value="http://www.runoob.com" // 生成二维码的内容
+              size={88} // 二维码的大小
+              fgColor="#000000" // 二维码的颜色
+            />
+          </div>
+          <span style={{ textAlign: 'center', width: 200 }}>(手机扫码查看)</span>
         </div>
       </div>
     );

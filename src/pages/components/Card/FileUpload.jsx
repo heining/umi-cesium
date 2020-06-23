@@ -44,7 +44,7 @@ class FileUpload extends Component {
     formData.append('pic_id', this.props.id);
     formData.append('title', 'pictest');
     formData.append('my_file', this.state.files[0]);
-    request('/api/v1/upload/picture', {
+    request('/api/v1/update/picture', {
       method: 'post',
       data: formData,
     })

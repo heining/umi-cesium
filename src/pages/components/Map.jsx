@@ -9,8 +9,8 @@ class Map extends Component {
     super();
     this.state = {
       showDetail: false,
-      id: 0
-    }
+      id: 0,
+    };
   }
 
   //  模型旋转、平移和贴地
@@ -26,9 +26,10 @@ class Map extends Component {
   };
 
   // 鼠标移动事件
-  mouseMove = (movement) => {
+  mouseMove = movement => {
     // 如果之前有选中的元素，则取消选中
     const highlighted = this.highlighted;
+    const selected = this.selected;
     if (Cesium.defined(highlighted.feature)) {
       highlighted.feature.color = highlighted.originalColor;
       highlighted.feature = undefined;
@@ -38,40 +39,54 @@ class Map extends Component {
       // 判断pick是否为空
       if (Cesium.defined(pick)) {
         // 根据每块玻璃的ID区分
-				const name = pick.getProperty('id');
-        if (name.includes('-')) {
+        const name = pick.getProperty('id');
+        if (pick !== selected.feature) {
           highlighted.feature = pick;
-					// Cesium.Color.clone(pick.color, highlighted.originalColor);
-					highlighted.feature.color = Cesium.Color.GOLD;
+          Cesium.Color.clone(pick.color, highlighted.originalColor);
+          if (name.includes('-')) {
+            pick.color = Cesium.Color.YELLOW;
+          }
         }
       }
     }
   };
 
   // 鼠标左键事件
-  mouseLeftClick = (movement) => {
-		const selected = this.selected;
-		// 如果之前有选中的元素，则取消选中
-		if(Cesium.defined(selected.feature)) {
-			selected.feature.color = selected.originalColor;
+  mouseLeftClick = movement => {
+    const selected = this.selected;
+    const highlighted = this.highlighted;
+    // 如果之前有选中的元素，则取消选中
+    if (Cesium.defined(selected.feature)) {
+      selected.feature.color = selected.originalColor;
       selected.feature = undefined;
-		}else {
+    } else {
       // 重新选择
       const pick = this.scene.pick(movement.position);
       // 判断pick是否为空
-      if(Cesium.defined(pick)) {
-         // 根据每块玻璃的ID区分
+      if (Cesium.defined(pick)) {
+        // 根据每块玻璃的ID区分
         const name = pick.getProperty('id');
-        console.log(name)
-        if(name.includes('-')) {
+        if (name.includes('-')) {
           selected.feature = pick;
+          if (pick === highlighted.feature) {
+            Cesium.Color.clone(highlighted.originalColor, selected.originalColor);
+            highlighted.feature = undefined;
+          } else {
+            Cesium.Color.clone(pick.color, selected.originalColor);
+          }
           this.setState({
             showDetail: true,
-            id: name
-          })
+            id: name, 
+          });
         }
-      }  
-		}
+      }
+    }
+  };
+
+  closeInfo = () => {
+    this.setState({
+      showDetail: false
+    })
   }
 
   componentDidMount() {
@@ -91,7 +106,7 @@ class Map extends Component {
     // 隐藏页面控件
     viewer._cesiumWidget._creditContainer.style.display = 'none';
     this.viewer = viewer;
-    // 创建场景对象 
+    // 创建场景对象
     const scene = viewer.scene;
     this.scene = scene;
     // 添加贴图
@@ -113,7 +128,7 @@ class Map extends Component {
         console.log(error);
       });
     // 定位
-    viewer.zoomTo(prds);
+    // viewer.zoomTo(prds);
 
     // 初始化选中和高光
     let selected = {
@@ -142,9 +157,32 @@ class Map extends Component {
 
   render() {
     return (
-      <div id="cesiumContainer" style={{width: '100%', height: '100%', backgroundColor: 'black'}}>
-        <Select style={{position: 'absolute'}} viewer={this.viewer} prds={this.prds} scene={this.scene}/>
-        { this.state.showDetail ? <Card style={{position: 'absolute'}} id={this.state.id} /> : <div></div>}
+      <div id="cesiumContainer" style={{ width: '100%', height: '100%', backgroundColor: 'black' }}>
+        <div
+          style={{
+            position: 'absolute',
+            color: 'white',
+            textAlign: 'center',
+            top: 20,
+            fontSize: 18,
+            fontWeight: 400,
+            zIndex: 1,
+            width: '100%',
+          }}
+        >
+          内部信息，请勿外传！
+        </div>
+        <Select
+          style={{ position: 'absolute' }}
+          viewer={this.viewer}
+          prds={this.prds}
+          scene={this.scene}
+        />
+        {this.state.showDetail ? (
+          <Card style={{ position: 'absolute' }} id={this.state.id} closeInfo={this.closeInfo}/>
+        ) : (
+          <div></div>
+        )}
       </div>
     );
   }

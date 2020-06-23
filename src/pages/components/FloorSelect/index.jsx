@@ -60,6 +60,7 @@ class FloorSelect extends Component {
           const featureId = feature.getProperty('id');
           // 循环遍历的id值要等于输入的id
           if (featureId == e) {
+            
             return Cesium.Color.clone(Cesium.Color.RED, result);
           } else {
             return Cesium.Color.clone(Cesium.Color.WHITE, result);
@@ -164,7 +165,6 @@ class FloorSelect extends Component {
           <Option value='2f-0194'>0194</Option>
         </Select>
         ) : <div></div>}
-        <br />
         <Input
           style={{ width: 240, marginTop: 20 }}
           placeholder="请输入玻璃编号"
