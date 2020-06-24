@@ -39,23 +39,33 @@ class FileUpload extends Component {
 
   // 文件提交
   handleSubmit = e => {
-    console.log(this.state.files);
+    console.log(this.state.files[0].name);
     const formData = new FormData();
     formData.append('pic_id', this.props.id);
     formData.append('title', 'pictest');
-    formData.append('my_file', this.state.files[0]);
-    request('/api/v1/update/picture', {
+    formData.append('my_file', this.state.files[0].name);
+    request('/api/v1/upload/picture', {
       method: 'post',
       data: formData,
     })
       .then(function(response) {
         console.log(response);
         if (response.result == 'failed') {
-          message.info('上传失败，请重试！');
+          // 图片已上传，继续上传需要调用update接口
+          request('/api/v1/update/picture', {
+            method: 'post',
+            data: formData,
+          })
+          .then(function(response) {  
+            console.log(response);
+            if (response.result == 'success') {
+              // card页面render一下
+              message.info('上传成功！');
+            }else {
+              message.info('上传失败！');
+            }
+          })
         } else {
-          this.setState({
-            files: [],
-          });
           message.info('上传成功！');
         }
       })

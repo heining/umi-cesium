@@ -16,9 +16,10 @@ class Card extends Component {
     super(props);
     this.state = {
       showDetail: true,
-      result: false,
+      showImg: false,
       showUpload: true,
-      showHistory: false
+      showHistory: false,
+      files: []
     };
   }
 
@@ -46,9 +47,6 @@ class Card extends Component {
       .then(function(response) {
         console.log(response);
         if (response.result == 'success') {
-          this.setState({
-            result: true,
-          });
           this.response.url = url;
         }
       })
@@ -93,7 +91,7 @@ class Card extends Component {
         </div>
         <div className="infoline">
           <span>图片：</span>
-          {this.state.result ? (
+          {this.state.showImg ? (
             <Zmage src={require(url)} style={{ width: '75%', height: '75%' }} />
           ) : (
             <Zmage src={require('@/assets/good.jpg')} style={{ width: '75%', height: '75%' }} />
