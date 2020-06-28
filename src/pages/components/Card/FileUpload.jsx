@@ -10,7 +10,7 @@ import request from 'umi-request';
 
 class FileUpload extends Component {
   constructor(props) {
-    super(props);
+    super(props); 
     this.state = {
       files: [],
       previewVisible: false,

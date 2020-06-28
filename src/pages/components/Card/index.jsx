@@ -90,11 +90,11 @@ class Card extends Component {
           <span>{this.props.id.substr(0, 1)}f前向左侧第3列</span>
         </div>
         <div className="infoline">
-          <span>图片：</span>
+          <span>当前图片：</span>
           {this.state.showImg ? (
             <Zmage src={require(url)} style={{ width: '75%', height: '75%' }} />
           ) : (
-            <Zmage src={require('@/assets/good.jpg')} style={{ width: '75%', height: '75%' }} />
+            <Zmage src={require('@/assets/good.jpg')} style={{ width: '75%', height: '75%', }} />
           )}
         </div>
         <div className="infoline">
@@ -114,8 +114,8 @@ class Card extends Component {
               fgColor="#000000" // 二维码的颜色
             />
           </div>
-          <span style={{ textAlign: 'center', width: 200 }}>(手机扫码查看)</span>
         </div>
+        <span style={{ width: 200, textAlign: 'center'}}>(手机扫码查看)</span>
       </div>
     );
   }
