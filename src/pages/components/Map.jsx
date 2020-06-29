@@ -1,8 +1,13 @@
 import React, { Component } from 'react';
 import * as Cesium from 'cesium';
-import Select from './FloorSelect/index';
+import FloorSelect from './FloorSelect/index';
 import Card from './Card/index';
+import History from './Card/History';
 import 'cesium/Source/Widgets/widgets.css';
+
+const arrs = [];
+// const styleArr = [];
+// const floorArr = [];
 
 class Map extends Component {
   constructor() {
@@ -10,6 +15,7 @@ class Map extends Component {
     this.state = {
       showDetail: false,
       id: 0,
+      arrs: [],
     };
   }
 
@@ -40,10 +46,11 @@ class Map extends Component {
       if (Cesium.defined(pick)) {
         // 根据每块玻璃的ID区分
         const name = pick.getProperty('id');
+        // console.log(name)
         if (pick !== selected.feature) {
           highlighted.feature = pick;
           Cesium.Color.clone(pick.color, highlighted.originalColor);
-          if (name.includes('-')) {
+          if (name.includes('GF')) {
             pick.color = Cesium.Color.YELLOW;
           }
         }
@@ -66,7 +73,8 @@ class Map extends Component {
       if (Cesium.defined(pick)) {
         // 根据每块玻璃的ID区分
         const name = pick.getProperty('id');
-        if (name.includes('-')) {
+        console.log(name);
+        if (name.includes('GF')) {
           selected.feature = pick;
           if (pick === highlighted.feature) {
             Cesium.Color.clone(highlighted.originalColor, selected.originalColor);
@@ -76,7 +84,8 @@ class Map extends Component {
           }
           this.setState({
             showDetail: true,
-            id: name, 
+            id: name,
+            showHistory: false,
           });
         }
       }
@@ -85,11 +94,19 @@ class Map extends Component {
 
   closeInfo = () => {
     this.setState({
-      showDetail: false
-    })
-  }
+      showDetail: false,
+    });
+  };
+
+  handleHistory = () => {
+    console.log('点击了');
+    this.setState({
+      showHistory: true,
+    });
+  };
 
   componentDidMount() {
+    const that = this;
     Cesium.Ion.defaultAccessToken =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiMzYxYTk3My01YjI2LTRiZjktOGU5ZC00MDQxZTJjZTRkYmUiLCJpZCI6Mjg0NjQsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTEyNjM0NTh9.zXiMNn0iN0bPaIqze4z4OC50aiID0B8-2d59_LkV0QU';
     const viewer = new Cesium.Viewer('cesiumContainer', {
@@ -110,25 +127,36 @@ class Map extends Component {
     const scene = viewer.scene;
     this.scene = scene;
     // 添加贴图
-    const prds = new Cesium.Cesium3DTileset({
-      url: 'http://cdn.lesuidao.cn/prds3/tileset.json',
+    const jyds = new Cesium.Cesium3DTileset({
+      url: 'http://cdn.lesuidao.cn/jyds/tileset.json',
       maximumScreenSpaceError: 2, //细化程度的最大屏幕空间错误（提高清晰度）
     });
-    this.prds = prds;
-    prds.readyPromise
-      .then(prds => {
-        // 模型贴地
-        // const translation = Cesium.Cartesian3.fromArray([0, 0, -25]);
-        // const m = Cesium.Matrix4.fromTranslation(translation);
-        // prds._modelMatrix = m;
-        this.modelRotation(prds, 60, 121.532038, 31.210968, 18.5);
-        viewer.scene.primitives.add(prds);
+    this.jyds = jyds;
+    jyds.readyPromise
+      .then(jyds => {
+        // this.modelRotation(jyds, 60, 121.532038, 31.210968, 18.5);
+        jyds.style = new Cesium.Cesium3DTileStyle({
+          // show: true,
+          color: {
+            evaluateColor: function(feature, result) {
+              const featureId = feature.getProperty('id');
+              if(featureId.includes('GF')){
+                arrs.push(featureId); 
+                that.setState({
+                  arrs,
+                });
+              }
+              return Cesium.Color.clone(Cesium.Color.WHITE, result);
+            },
+          },
+        });
+        viewer.scene.primitives.add(jyds);
       })
       .otherwise(function(error) {
         console.log(error);
       });
     // 定位
-    // viewer.zoomTo(prds);
+    viewer.zoomTo(jyds);
 
     // 初始化选中和高光
     let selected = {
@@ -172,17 +200,21 @@ class Map extends Component {
         >
           内部信息，请勿外传！
         </div>
-        <Select
+        <FloorSelect
           style={{ position: 'absolute' }}
           viewer={this.viewer}
-          prds={this.prds}
+          jyds={this.jyds}
           scene={this.scene}
+          arrs={this.state.arrs}
         />
+        {/* 详细信息 */}
         {this.state.showDetail ? (
-          <Card style={{ position: 'absolute' }} id={this.state.id} closeInfo={this.closeInfo}/>
+          <Card style={{ position: 'absolute' }} id={this.state.id} closeInfo={this.closeInfo} />
         ) : (
           <div></div>
         )}
+        {/* 历史图片 */}
+        {this.state.showHistory ? <History closeHistory={this.closeHistory} /> : <div></div>}
       </div>
     );
   }

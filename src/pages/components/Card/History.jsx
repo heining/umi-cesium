@@ -13,12 +13,18 @@ class History extends Component {
     }
   }
 
+  closeHistory = () => {
+    this.setState({
+      showHistory: false
+    })
+  }
+
   render() {
     return (
       <div className="infobox" style={{ left: 10 }}>
         <div
           style={{ position: 'absolute', right: 15, top: 10, cursor: 'pointer', zIndex: 10 }}
-          onClick={this.props.closeHistory}
+          onClick={this.closeHistory}
         >
           X
         </div>

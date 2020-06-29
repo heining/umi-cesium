@@ -23,18 +23,6 @@ class Card extends Component {
     };
   }
 
-  handleHistory = () => {
-    this.setState({
-      showHistory: true
-    })
-  }
-
-  closeHistory = () => {
-    this.setState({
-      showHistory: false
-    })
-  }
-
   componentDidMount() {
     // 每点击一块玻璃，进行一次请求
     const urlencoded = new URLSearchParams();
@@ -98,8 +86,7 @@ class Card extends Component {
           )}
         </div>
         <div className="infoline">
-          <a onClick={this.handleHistory}>历史图片</a>
-          { this.state.showHistory ? <History closeHistory={this.closeHistory}/> : <div></div>}
+          <a onClick={this.props.handleHistory} >历史图片</a>
         </div>
         <div className="infoline">
           <FileUpload id={this.props.id} />
