@@ -244,7 +244,7 @@ class FloorSelect extends Component {
           )}
           <br />
           <Input
-            style={{ width: 300, marginTop: 20, left: -100,}}
+            style={{ width: 300, marginTop: 20, left: -100 }}
             placeholder="请输入幕墙编号"
             allowClear
             onChange={this.handleChange}

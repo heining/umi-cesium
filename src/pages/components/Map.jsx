@@ -141,12 +141,15 @@ class Map extends Component {
     const jyds = new Cesium.Cesium3DTileset({
       url: 'http://cdn.lesuidao.cn/jyds8/tileset.json',
       maximumScreenSpaceError: 4, //细化程度的最大屏幕空间错误（提高清晰度）
-      maximumMemoryUsage: 1024
+      maximumMemoryUsage: 1024,
+      dynamicScreenSpaceError: true
     });
     const model11 = new Cesium.Cesium3DTileset({
       url: 'http://cdn.lesuidao.cn/11/tileset.json',
-      maximumScreenSpaceError: 16, //细化程度的最大屏幕空间错误（提高清晰度）
-      maximumMemoryUsage: 1024
+      maximumScreenSpaceError: 160, //细化程度的最大屏幕空间错误（提高清晰度）
+      maximumMemoryUsage: 1024,
+      dynamicScreenSpaceError: true,
+      dynamicScreenSpaceErrorDensity: 3
     });
     this.jyds = jyds;
     jyds.readyPromise
