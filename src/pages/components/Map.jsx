@@ -6,14 +6,13 @@ import History from './Card/History';
 import 'cesium/Source/Widgets/widgets.css';
 
 const arrs = [];
-// const styleArr = [];
-// const floorArr = [];
 
 class Map extends Component {
   constructor() {
     super();
     this.state = {
       showDetail: false,
+      showHistory: false,
       id: 0,
       arrs: [],
     };
@@ -69,11 +68,11 @@ class Map extends Component {
     } else {
       // 重新选择
       const pick = this.scene.pick(movement.position);
+      console.log(pick)
       // 判断pick是否为空
       if (Cesium.defined(pick)) {
         // 根据每块玻璃的ID区分
         const name = pick.getProperty('id');
-        console.log(name);
         if (name.includes('GF')) {
           selected.feature = pick;
           if (pick === highlighted.feature) {
@@ -98,18 +97,24 @@ class Map extends Component {
     });
   };
 
-  handleHistory = () => {
-    console.log('点击了');
+  showhistory = () => {
     this.setState({
       showHistory: true,
     });
   };
+
+  closehistory = () => {
+    this.setState({
+      showHistory: false
+    })
+  }
 
   componentDidMount() {
     const that = this;
     Cesium.Ion.defaultAccessToken =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiMzYxYTk3My01YjI2LTRiZjktOGU5ZC00MDQxZTJjZTRkYmUiLCJpZCI6Mjg0NjQsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTEyNjM0NTh9.zXiMNn0iN0bPaIqze4z4OC50aiID0B8-2d59_LkV0QU';
     const viewer = new Cesium.Viewer('cesiumContainer', {
+      bottomContainer: false,
       geocoder: false,
       homeButton: false,
       sceneModePicker: false,
@@ -119,6 +124,7 @@ class Map extends Component {
       timeline: false,
       fullscreenButton: false,
       vrButton: false,
+      infoBox: false,
     });
     // 隐藏页面控件
     viewer._cesiumWidget._creditContainer.style.display = 'none';
@@ -126,22 +132,33 @@ class Map extends Component {
     // 创建场景对象
     const scene = viewer.scene;
     this.scene = scene;
+    // 场景的后期处理
+    const postProcessStageCollection = new Cesium.PostProcessStageCollection({
+      fxaa: true
+    })
+    scene.postProcessStages.add(postProcessStageCollection)
     // 添加贴图
     const jyds = new Cesium.Cesium3DTileset({
-      url: 'http://cdn.lesuidao.cn/jyds/tileset.json',
-      maximumScreenSpaceError: 2, //细化程度的最大屏幕空间错误（提高清晰度）
+      url: 'http://cdn.lesuidao.cn/jyds8/tileset.json',
+      maximumScreenSpaceError: 4, //细化程度的最大屏幕空间错误（提高清晰度）
+      maximumMemoryUsage: 1024
+    });
+    const model11 = new Cesium.Cesium3DTileset({
+      url: 'http://cdn.lesuidao.cn/11/tileset.json',
+      maximumScreenSpaceError: 16, //细化程度的最大屏幕空间错误（提高清晰度）
+      maximumMemoryUsage: 1024
     });
     this.jyds = jyds;
     jyds.readyPromise
       .then(jyds => {
-        // this.modelRotation(jyds, 60, 121.532038, 31.210968, 18.5);
+        this.modelRotation(jyds, 50, 121.499487, 31.24127, 90.77);
         jyds.style = new Cesium.Cesium3DTileStyle({
           // show: true,
           color: {
             evaluateColor: function(feature, result) {
               const featureId = feature.getProperty('id');
-              if(featureId.includes('GF')){
-                arrs.push(featureId); 
+              if (featureId.includes('GF')) {
+                arrs.push(featureId);
                 that.setState({
                   arrs,
                 });
@@ -150,14 +167,23 @@ class Map extends Component {
             },
           },
         });
-        viewer.scene.primitives.add(jyds);
+        scene.primitives.add(jyds);
+        scene.primitives.add(model11);
+      })
+      .otherwise(function(error) {
+        console.log(error);
+      });
+      model11.readyPromise
+      .then(model11 => {
+        this.modelRotation(model11, 5, 121.498920, 31.239405, -141.6177112372341);
+        scene.primitives.add(model11);
       })
       .otherwise(function(error) {
         console.log(error);
       });
     // 定位
-    viewer.zoomTo(jyds);
-
+    // viewer.zoomTo(jyds);
+    
     // 初始化选中和高光
     let selected = {
       feature: undefined,
@@ -209,12 +235,12 @@ class Map extends Component {
         />
         {/* 详细信息 */}
         {this.state.showDetail ? (
-          <Card style={{ position: 'absolute' }} id={this.state.id} closeInfo={this.closeInfo} />
+          <Card style={{ position: 'absolute' }} id={this.state.id} closeInfo={this.closeInfo} showHistory={this.state.showHistory} showhistory={this.showhistory}/>
         ) : (
           <div></div>
         )}
         {/* 历史图片 */}
-        {this.state.showHistory ? <History closeHistory={this.closeHistory} /> : <div></div>}
+        {this.state.showHistory ? <History closehistory={this.closehistory} /> : <div></div>}
       </div>
     );
   }

@@ -7,24 +7,19 @@ const Item = Timeline.Item;
 
 class History extends Component {
   constructor(props) {
+    console.log(props)
     super(props);
     this.state = {
       showHistory: true
     }
   }
 
-  closeHistory = () => {
-    this.setState({
-      showHistory: false
-    })
-  }
-
   render() {
     return (
-      <div className="infobox" style={{ left: 10 }}>
+      <div className="infobox" style={{width: 200, right: 260}}>
         <div
           style={{ position: 'absolute', right: 15, top: 10, cursor: 'pointer', zIndex: 10 }}
-          onClick={this.closeHistory}
+          onClick={this.props.closehistory}
         >
           X
         </div>

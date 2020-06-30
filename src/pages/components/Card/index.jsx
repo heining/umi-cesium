@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import request from 'umi-request';
 import FileUpload from './FileUpload';
-import History from './History';
 import Zmage from 'react-zmage';
 import QRCode from 'qrcode.react';
 import './index.css';
@@ -9,22 +8,23 @@ import './index.css';
 // 刷新页面的随机取
 const items = ['良好', '破损'];
 const item = items[Math.floor(Math.random() * 2)];
-const url = '';
+let url = '';
 
 class Card extends Component {
   constructor(props) {
+    console.log(props)
     super(props);
     this.state = {
+      ...props,
       showDetail: true,
       showImg: false,
       showUpload: true,
-      showHistory: false,
       files: []
     };
   }
 
   componentDidMount() {
-    // 每点击一块玻璃，进行一次请求
+    // 每点击一块玻璃，进行一次请求(render)
     const urlencoded = new URLSearchParams();
     urlencoded.append('pic_id', this.props.id);
     urlencoded.append('title', 'pictest');
@@ -33,9 +33,16 @@ class Card extends Component {
         data: urlencoded,
       })
       .then(function(response) {
-        console.log(response);
         if (response.result == 'success') {
-          this.response.url = url;
+          this.setState({
+            showImg: true
+          })
+          url = response.url
+          console.log(url)
+        }else {
+          this.setState({
+            showImg: false
+          })
         }
       })
       .catch(function(error) {
@@ -75,7 +82,7 @@ class Card extends Component {
         </div>
         <div className="infoline">
           <span>位置：</span>
-          <span>{this.props.id.substr(0, 1)}f前向左侧第3列</span>
+          <span>{this.props.id.slice(15, 17)}楼{this.props.id.slice(3, 6)}号</span>
         </div>
         <div className="infoline">
           <span>当前图片：</span>
@@ -86,7 +93,7 @@ class Card extends Component {
           )}
         </div>
         <div className="infoline">
-          <a onClick={this.props.handleHistory} >历史图片</a>
+          <a onClick={this.props.showhistory} >历史图片</a>
         </div>
         <div className="infoline">
           <FileUpload id={this.props.id} />
