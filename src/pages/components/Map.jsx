@@ -141,17 +141,15 @@ class Map extends Component {
     const jyds = new Cesium.Cesium3DTileset({
       url: 'http://cdn.lesuidao.cn/jyds8/tileset.json',
       maximumScreenSpaceError: 4, //细化程度的最大屏幕空间错误（提高清晰度）
-      maximumMemoryUsage: 1024,
-      dynamicScreenSpaceError: true
+      maximumMemoryUsage: 1024
     });
     const model11 = new Cesium.Cesium3DTileset({
       url: 'http://cdn.lesuidao.cn/11/tileset.json',
       maximumScreenSpaceError: 160, //细化程度的最大屏幕空间错误（提高清晰度）
-      maximumMemoryUsage: 1024,
-      dynamicScreenSpaceError: true,
-      dynamicScreenSpaceErrorDensity: 3
+      maximumMemoryUsage: 1024
     });
     this.jyds = jyds;
+    this.model11 = model11;
     jyds.readyPromise
       .then(jyds => {
         this.modelRotation(jyds, 50, 121.499487, 31.24127, 90.77);
@@ -232,7 +230,7 @@ class Map extends Component {
         <FloorSelect
           style={{ position: 'absolute' }}
           viewer={this.viewer}
-          jyds={this.jyds}
+          model11={this.model11}
           scene={this.scene}
           arrs={this.state.arrs}
         />

@@ -22,7 +22,7 @@ class FloorSelect extends Component {
     super(props);
     this.state = {
       id: '',
-      arrs: [],
+      arrs: [], 
       style: '',
       styleName: '',
       floor: '',
@@ -54,7 +54,7 @@ class FloorSelect extends Component {
       floorArr,
     });
     // 跳转
-    this.props.viewer.flyTo(this.props.jyds);
+    this.props.viewer.flyTo(this.props.model11);
   };
 
   handleCChange = e => {
@@ -68,6 +68,7 @@ class FloorSelect extends Component {
   // 设置选中同一类的颜色
   selectCColor = (target, styleName) => {
     const that = this;
+    Cgrass = [];
     target.style = new Cesium.Cesium3DTileStyle({
       // show: true,
       color: {
@@ -75,6 +76,7 @@ class FloorSelect extends Component {
           const featureId = feature.getProperty('id');
           if (featureId.includes(styleName)) {
             Cgrass.push(featureId);
+            console.log(Cgrass)
             Cgrass = Array.from(new Set(Cgrass));
             that.setState({
               Cgrass,
@@ -90,6 +92,7 @@ class FloorSelect extends Component {
 
   handleGFChange = e => {
     console.log(e);
+
     this.setState({
       floor: e,
     });
@@ -99,6 +102,7 @@ class FloorSelect extends Component {
   // 设置选中同一楼层的颜色
   selectGFColor = (target, floor) => {
     const that = this;
+    GFgrass = [];
     target.style = new Cesium.Cesium3DTileStyle({
       // show: true,
       color: {
@@ -201,6 +205,7 @@ class FloorSelect extends Component {
               </Select>
               <Select
                 placeholder={'请选择幕墙'}
+                defaultValue={Cgrass[0]}
                 style={{ width: 200, marginRight: 20, float: 'left' }}
                 onChange={this.handleGlassChange}
               >
@@ -229,6 +234,7 @@ class FloorSelect extends Component {
               </Select>
               <Select
                 placeholder={'请选择幕墙'}
+                defaultValue={GFgrass[0]}
                 style={{ width: 200, marginRight: 20, float: 'left' }}
                 onChange={this.handleGlassChange}
               >
