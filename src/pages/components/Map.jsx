@@ -140,7 +140,7 @@ class Map extends Component {
       navigationHelpButton: false,
       animation: false,
       timeline: false,
-      fullscreenButton: false,
+      fullscreenButton: true,
       vrButton: false,
       infoBox: false,
     });
@@ -151,13 +151,10 @@ class Map extends Component {
     const scene = viewer.scene;
     this.scene = scene;
     // 场景的后期处理
-    const postProcessStageCollection = new Cesium.PostProcessStageCollection({
-      fxaa: true,
-    });
-    scene.postProcessStages.add(postProcessStageCollection);
+    viewer.scene.postProcessStages.fxaa.enabled = true;
     // 添加贴图
     const model11 = new Cesium.Cesium3DTileset({
-      url: 'http://cdn.lesuidao.cn/11/tileset.json',
+      url: 'http://cdn.lesuidao.cn/ljz11/tileset.json',
       maximumScreenSpaceError: 160, //细化程度的最大屏幕空间错误（提高清晰度）
       maximumMemoryUsage: 1024,
     });
@@ -172,7 +169,7 @@ class Map extends Component {
       });
 
     const jyds = new Cesium.Cesium3DTileset({
-      url: 'http://cdn.lesuidao.cn/5/tileset.json',
+      url: 'http://cdn.lesuidao.cn/8/tileset.json',
       maximumScreenSpaceError: 4, //细化程度的最大屏幕空间错误（提高清晰度）
       maximumMemoryUsage: 1024,
     });
@@ -232,7 +229,7 @@ class Map extends Component {
 
   render() {
     return (
-      <div id="cesiumContainer" style={{ width: '100%', height: '100%', backgroundColor: 'black' }}>
+      <div id="cesiumContainer" style={{width: '100vw', height: '100vh'}}>
         <div
           style={{
             position: 'absolute',
@@ -250,6 +247,7 @@ class Map extends Component {
         <FloorSelect
           style={{ position: 'absolute' }}
           viewer={this.viewer}
+          jyds={this.jyds}
           model11={this.model11}
           scene={this.scene}
           arrs={this.state.arrs}

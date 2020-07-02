@@ -6,6 +6,6 @@ import Map from './components/Map';
 
 export default function() {
   return ( 
-    <Map style={{width: '100%', backgroundColor: 'black'}}/>
+    <Map style={{width: '100vw', height: '100vh', backgroundColor: 'black'}}/>
   );
 }

@@ -16,7 +16,7 @@ let GFgrass = [];
 let className = '';
 let floorNum = '';
 const pinBuilder = new Cesium.PinBuilder();
-const selectedEntity = new Cesium.Entity()
+const selectedEntity = new Cesium.Entity();
 
 class FloorSelect extends Component {
   constructor(props) {
@@ -34,6 +34,12 @@ class FloorSelect extends Component {
       GFgrass: [],
       value: '',
       showCheckStatus: false,
+      detected1: '',
+      detected2: '',
+      detected3: '',
+      notdetected5: '',
+      notdetected6: '',
+      notdetected7: '',
     };
   }
 
@@ -77,7 +83,7 @@ class FloorSelect extends Component {
     target.style = new Cesium.Cesium3DTileStyle({
       // show: true,
       color: {
-        evaluateColor: function (feature, result) {
+        evaluateColor: function(feature, result) {
           const featureId = feature.getProperty('id');
           if (featureId.includes(styleName)) {
             Cgrass.push(featureId);
@@ -108,10 +114,11 @@ class FloorSelect extends Component {
   selectGFColor = (target, floor) => {
     const that = this;
     GFgrass = [];
+    console.log(target);
     target.style = new Cesium.Cesium3DTileStyle({
       // show: true,
       color: {
-        evaluateColor: function (feature, result) {
+        evaluateColor: function(feature, result) {
           const featureId = feature.getProperty('id');
           if (featureId.includes(floor)) {
             GFgrass.push(featureId);
@@ -136,7 +143,7 @@ class FloorSelect extends Component {
       // show: true,
       // feature: 切片
       color: {
-        evaluateColor: function (feature, result) {
+        evaluateColor: function(feature, result) {
           const featureId = feature.getProperty('id');
           // 循环遍历的id值要等于输入的id
           if (featureId == e) {
@@ -167,7 +174,7 @@ class FloorSelect extends Component {
       // show: true,
       // feature: 切片
       color: {
-        evaluateColor: function (feature, result) {
+        evaluateColor: function(feature, result) {
           const featureId = feature.getProperty('id');
           // 循环遍历的id值要等于输入的id
           if (featureId == id) {
@@ -228,21 +235,43 @@ class FloorSelect extends Component {
     const notdetected5 = this.createPin(121.504343, 31.241308, '待检测', 'RED', 86); // 华夏银行大厦
     const notdetected6 = this.createPin(121.497781, 31.238941, '待检测', 'RED', 250); //国金中心
     const notdetected7 = this.createPin(121.495841, 31.23787, '待检测', 'RED', 130); //香格里拉大酒店
+    this.setState({
+      detected1,
+      detected2,
+      detected3,
+      notdetected5,
+      notdetected6,
+      notdetected7
+    });
     detected1.show = true;
     detected2.show = true;
     detected3.show = true;
     notdetected5.show = true;
     notdetected6.show = true;
     notdetected7.show = true;
-    this.floorcolor(this.props.model11)
+    this.floorcolor(this.props.model11);
     this.props.viewer.flyTo(this.props.model11, {
       duration: 3,
-      offset: new Cesium.HeadingPitchRange(-10, -0.5, this.props.model11.boundingSphere.radius * 1.6),
-    })
+      offset: new Cesium.HeadingPitchRange(
+        -10,
+        -0.5,
+        this.props.model11.boundingSphere.radius * 1.6,
+      ),
+    });
     this.setState({
       showCheckStatus: true,
     });
   };
+
+  handleHidePin = () => {
+    let {detected1, detected2, detected3, notdetected5, notdetected6, notdetected7} = this.state;
+    detected1.show = false;
+    detected2.show = false;
+    detected3.show = false;
+    notdetected5.show = false;
+    notdetected6.show = false;
+    notdetected7.show = false;
+  }
 
   render() {
     return (
@@ -285,8 +314,8 @@ class FloorSelect extends Component {
               </Select>
             </>
           ) : (
-              <div style={{ float: 'left' }}></div>
-            )}
+            <div style={{ float: 'left' }}></div>
+          )}
           {this.state.style == 'GF' ? (
             <>
               <Select
@@ -313,8 +342,8 @@ class FloorSelect extends Component {
               </Select>
             </>
           ) : (
-              <div></div>
-            )}
+            <div></div>
+          )}
           <br />
           <Input
             style={{ width: 300, marginTop: 20 }}
@@ -323,10 +352,10 @@ class FloorSelect extends Component {
             onChange={this.handleChange}
             onPressEnter={this.handleEnter}
           />
-          <div style={{ color: 'red', fontSize: 12, textAlign: 'left' }}>
+          <div style={{ color: 'green', fontSize: 12, textAlign: 'left' }}>
             请按照当前格式输入：L2N072-(C74)GF013
           </div>
-          <div style={{ color: 'red', fontSize: 12, textAlign: 'left' }}>
+          <div style={{ color: 'green', fontSize: 12, textAlign: 'left' }}>
             其中L2:幕墙中的小层, N072: 每块幕墙的序列号, C74: 幕墙类型, GF013: 幕墙楼层
           </div>
         </div>
@@ -339,7 +368,7 @@ class FloorSelect extends Component {
           <Radio value={1} style={{ color: 'white' }} onClick={this.handleCheck}>
             检测状态
           </Radio>
-          <Radio style={{ color: 'white' }} value={2} onClick={this.props.handleHideBuildings}>
+          <Radio style={{ color: 'white' }} value={2} onClick={() => {this.props.handleHideBuildings() ; this.handleHidePin()}}>
             隐藏楼群
           </Radio>
           <Radio style={{ color: 'white' }} value={3} onClick={this.props.handleShowBuildings}>
@@ -362,8 +391,8 @@ class FloorSelect extends Component {
             </div>
           </>
         ) : (
-            <div></div>
-          )}
+          <div></div>
+        )}
       </div>
     );
   }
