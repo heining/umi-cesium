@@ -5,7 +5,7 @@
 
 import React, { Component } from 'react';
 import * as Cesium from 'cesium';
-import { Select, Input } from 'antd';
+import { Select, Input, Radio } from 'antd';
 import '../Card/index.css';
 
 const { Option } = Select;
@@ -15,6 +15,8 @@ let Cgrass = [];
 let GFgrass = [];
 let className = '';
 let floorNum = '';
+const pinBuilder = new Cesium.PinBuilder();
+const selectedEntity = new Cesium.Entity()
 
 class FloorSelect extends Component {
   constructor(props) {
@@ -22,7 +24,7 @@ class FloorSelect extends Component {
     super(props);
     this.state = {
       id: '',
-      arrs: [], 
+      arrs: [],
       style: '',
       styleName: '',
       floor: '',
@@ -30,6 +32,8 @@ class FloorSelect extends Component {
       floorArr: [],
       Cgrass: [],
       GFgrass: [],
+      value: '',
+      showCheckStatus: false,
     };
   }
 
@@ -40,6 +44,7 @@ class FloorSelect extends Component {
       arrs.map((item, index) => {
         className = item.split('(')[1].split(')')[0];
         floorNum = item.slice(12, 17);
+        // floorNum = item.split(')'[1]);
         styleArr.push(className);
         floorArr.push(floorNum);
         // 数组去重
@@ -72,11 +77,11 @@ class FloorSelect extends Component {
     target.style = new Cesium.Cesium3DTileStyle({
       // show: true,
       color: {
-        evaluateColor: function(feature, result) {
+        evaluateColor: function (feature, result) {
           const featureId = feature.getProperty('id');
           if (featureId.includes(styleName)) {
             Cgrass.push(featureId);
-            console.log(Cgrass)
+            console.log(Cgrass);
             Cgrass = Array.from(new Set(Cgrass));
             that.setState({
               Cgrass,
@@ -106,7 +111,7 @@ class FloorSelect extends Component {
     target.style = new Cesium.Cesium3DTileStyle({
       // show: true,
       color: {
-        evaluateColor: function(feature, result) {
+        evaluateColor: function (feature, result) {
           const featureId = feature.getProperty('id');
           if (featureId.includes(floor)) {
             GFgrass.push(featureId);
@@ -131,7 +136,7 @@ class FloorSelect extends Component {
       // show: true,
       // feature: 切片
       color: {
-        evaluateColor: function(feature, result) {
+        evaluateColor: function (feature, result) {
           const featureId = feature.getProperty('id');
           // 循环遍历的id值要等于输入的id
           if (featureId == e) {
@@ -162,7 +167,7 @@ class FloorSelect extends Component {
       // show: true,
       // feature: 切片
       color: {
-        evaluateColor: function(feature, result) {
+        evaluateColor: function (feature, result) {
           const featureId = feature.getProperty('id');
           // 循环遍历的id值要等于输入的id
           if (featureId == id) {
@@ -172,6 +177,70 @@ class FloorSelect extends Component {
           }
         },
       },
+    });
+  };
+
+  /**
+   * @ 新增功能
+   */
+  // 单选按钮切换
+  onChange = e => {
+    this.setState({
+      value: e.target.value,
+    });
+  };
+
+  // 画布
+  createPin = (lon, lat, shu, colorpin, height) => {
+    return this.props.viewer.entities.add({
+      // name: name,
+      show: false,
+      position: Cesium.Cartesian3.fromDegrees(lon, lat, height),
+      billboard: {
+        image: pinBuilder.fromText(shu, Cesium.Color[colorpin], 88).toDataURL(),
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+      },
+    });
+  };
+
+  // 检测状态的颜色分类
+  floorcolor = target => {
+    target.style = new Cesium.Cesium3DTileStyle({
+      show: true,
+      color: {
+        conditions: [
+          // ['${floor} >= 70', "color('red')"],
+          // ['${floor} === 40', "color('red')"],
+          // ['${floor} === 20', "color('orange')"],
+          ['true', "color('white')"],
+        ],
+      },
+    });
+    // this.props.model11.style = new Cesium.Cesium3DTileStyle({
+    //   color: "color('Cesium.Color.GREEN')",
+    // });
+  };
+
+  handleCheck = () => {
+    const detected1 = this.createPin(121.503149, 31.236429, '已检测', 'GREEN', 492); // 上海环球金融中心
+    const detected2 = this.createPin(121.498059, 31.241105, '已检测', 'GREEN', 170); // 中国平安金融大厦
+    const detected3 = this.createPin(121.495987, 31.235635, '已检测', 'GREEN', 180); //花旗集团大厦
+    const notdetected5 = this.createPin(121.504343, 31.241308, '待检测', 'RED', 86); // 华夏银行大厦
+    const notdetected6 = this.createPin(121.497781, 31.238941, '待检测', 'RED', 250); //国金中心
+    const notdetected7 = this.createPin(121.495841, 31.23787, '待检测', 'RED', 130); //香格里拉大酒店
+    detected1.show = true;
+    detected2.show = true;
+    detected3.show = true;
+    notdetected5.show = true;
+    notdetected6.show = true;
+    notdetected7.show = true;
+    this.floorcolor(this.props.model11)
+    this.props.viewer.flyTo(this.props.model11, {
+      duration: 3,
+      offset: new Cesium.HeadingPitchRange(-10, -0.5, this.props.model11.boundingSphere.radius * 1.6),
+    })
+    this.setState({
+      showCheckStatus: true,
     });
   };
 
@@ -205,7 +274,6 @@ class FloorSelect extends Component {
               </Select>
               <Select
                 placeholder={'请选择幕墙'}
-                defaultValue={Cgrass[0]}
                 style={{ width: 200, marginRight: 20, float: 'left' }}
                 onChange={this.handleGlassChange}
               >
@@ -217,8 +285,8 @@ class FloorSelect extends Component {
               </Select>
             </>
           ) : (
-            <div style={{ float: 'left' }}></div>
-          )}
+              <div style={{ float: 'left' }}></div>
+            )}
           {this.state.style == 'GF' ? (
             <>
               <Select
@@ -234,7 +302,6 @@ class FloorSelect extends Component {
               </Select>
               <Select
                 placeholder={'请选择幕墙'}
-                defaultValue={GFgrass[0]}
                 style={{ width: 200, marginRight: 20, float: 'left' }}
                 onChange={this.handleGlassChange}
               >
@@ -246,21 +313,57 @@ class FloorSelect extends Component {
               </Select>
             </>
           ) : (
-            <div></div>
-          )}
+              <div></div>
+            )}
           <br />
           <Input
-            style={{ width: 300, marginTop: 20, left: -100 }}
+            style={{ width: 300, marginTop: 20 }}
             placeholder="请输入幕墙编号"
             allowClear
             onChange={this.handleChange}
             onPressEnter={this.handleEnter}
           />
-          <div style={{ color: 'red', fontSize: 12, textAlign: 'left'}}>请按照当前格式输入：L2N072-(C74)GF013</div>
+          <div style={{ color: 'red', fontSize: 12, textAlign: 'left' }}>
+            请按照当前格式输入：L2N072-(C74)GF013
+          </div>
           <div style={{ color: 'red', fontSize: 12, textAlign: 'left' }}>
             其中L2:幕墙中的小层, N072: 每块幕墙的序列号, C74: 幕墙类型, GF013: 幕墙楼层
           </div>
         </div>
+        {/* 新增功能，date: 2020-07-02 */}
+        <Radio.Group
+          onChange={this.onChange}
+          value={this.state.value}
+          style={{ color: 'white', marginTop: 10 }}
+        >
+          <Radio value={1} style={{ color: 'white' }} onClick={this.handleCheck}>
+            检测状态
+          </Radio>
+          <Radio style={{ color: 'white' }} value={2} onClick={this.props.handleHideBuildings}>
+            隐藏楼群
+          </Radio>
+          <Radio style={{ color: 'white' }} value={3} onClick={this.props.handleShowBuildings}>
+            显示楼群
+          </Radio>
+        </Radio.Group>
+        {this.state.showCheckStatus ? (
+          <>
+            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
+              <div style={{ display: 'flex', alignItems: 'center', float: 'left' }}>
+                <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>未检测</span>
+              </div>
+            </div>
+            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="colorbox" style={{ backgroundColor: 'green' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>已检测</span>
+              </div>
+            </div>
+          </>
+        ) : (
+            <div></div>
+          )}
       </div>
     );
   }

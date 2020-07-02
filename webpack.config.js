@@ -9,4 +9,10 @@ module.exports = {
       '@': require('path').resolve(__dirname, 'src'),
     },
   },
+  externals: {
+    cesium: 'Cesium',
+  },
+  scripts: [
+    'https://cesium.com/downloads/cesiumjs/releases/1.70.1/Build/Cesium/Cesium.js',
+  ]
 };

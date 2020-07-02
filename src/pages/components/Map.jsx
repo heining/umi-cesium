@@ -13,6 +13,7 @@ class Map extends Component {
     this.state = {
       showDetail: false,
       showHistory: false,
+      showBuildings: true,
       id: 0,
       arrs: [],
     };
@@ -44,14 +45,18 @@ class Map extends Component {
       // 判断pick是否为空
       if (Cesium.defined(pick)) {
         // 根据每块玻璃的ID区分
-        const name = pick.getProperty('id');
-        // console.log(name)
-        if (pick !== selected.feature) {
-          highlighted.feature = pick;
-          Cesium.Color.clone(pick.color, highlighted.originalColor);
-          if (name.includes('GF')) {
-            pick.color = Cesium.Color.YELLOW;
+        try {
+          const name = pick.getProperty('id');
+          // console.log(name)
+          if (pick !== selected.feature) {
+            highlighted.feature = pick;
+            Cesium.Color.clone(pick.color, highlighted.originalColor);
+            if (name.includes('GF')) {
+              pick.color = Cesium.Color.YELLOW;
+            }
           }
+        } catch (error) {
+          console.error(error);
         }
       }
     }
@@ -68,7 +73,7 @@ class Map extends Component {
     } else {
       // 重新选择
       const pick = this.scene.pick(movement.position);
-      console.log(pick)
+      console.log(pick);
       // 判断pick是否为空
       if (Cesium.defined(pick)) {
         // 根据每块玻璃的ID区分
@@ -105,11 +110,24 @@ class Map extends Component {
 
   closehistory = () => {
     this.setState({
-      showHistory: false
-    })
-  }
+      showHistory: false,
+    });
+  };
+
+  handleHideBuildings = () => {
+    this.model11.show = false;
+  };
+
+  handleShowBuildings = () => {
+    this.model11.show = true;
+    this.scene.primitives.add(this.model11);
+  };
 
   componentDidMount() {
+    // let script = document.createElement('script');
+    // script.type = 'text/javascript';
+    // script.src = `https://cesium.com/downloads/cesiumjs/releases/1.70.1/Build/Cesium/Cesium.js`;
+    // document.body.appendChild(script);
     const that = this;
     Cesium.Ion.defaultAccessToken =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiMzYxYTk3My01YjI2LTRiZjktOGU5ZC00MDQxZTJjZTRkYmUiLCJpZCI6Mjg0NjQsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTEyNjM0NTh9.zXiMNn0iN0bPaIqze4z4OC50aiID0B8-2d59_LkV0QU';
@@ -134,22 +152,31 @@ class Map extends Component {
     this.scene = scene;
     // 场景的后期处理
     const postProcessStageCollection = new Cesium.PostProcessStageCollection({
-      fxaa: true
-    })
-    scene.postProcessStages.add(postProcessStageCollection)
-    // 添加贴图
-    const jyds = new Cesium.Cesium3DTileset({
-      url: 'http://cdn.lesuidao.cn/jyds8/tileset.json',
-      maximumScreenSpaceError: 4, //细化程度的最大屏幕空间错误（提高清晰度）
-      maximumMemoryUsage: 1024
+      fxaa: true,
     });
+    scene.postProcessStages.add(postProcessStageCollection);
+    // 添加贴图
     const model11 = new Cesium.Cesium3DTileset({
       url: 'http://cdn.lesuidao.cn/11/tileset.json',
       maximumScreenSpaceError: 160, //细化程度的最大屏幕空间错误（提高清晰度）
-      maximumMemoryUsage: 1024
+      maximumMemoryUsage: 1024,
+    });
+    this.model11 = model11;
+    model11.readyPromise
+      .then(model11 => {
+        this.modelRotation(model11, 5, 121.49892, 31.239405, -141.6177112372341);
+        scene.primitives.add(model11);
+      })
+      .otherwise(function(error) {
+        console.log(error);
+      });
+
+    const jyds = new Cesium.Cesium3DTileset({
+      url: 'http://cdn.lesuidao.cn/5/tileset.json',
+      maximumScreenSpaceError: 4, //细化程度的最大屏幕空间错误（提高清晰度）
+      maximumMemoryUsage: 1024,
     });
     this.jyds = jyds;
-    this.model11 = model11;
     jyds.readyPromise
       .then(jyds => {
         this.modelRotation(jyds, 50, 121.499487, 31.24127, 90.77);
@@ -169,22 +196,15 @@ class Map extends Component {
           },
         });
         scene.primitives.add(jyds);
-        scene.primitives.add(model11);
+        // scene.primitives.add(model11);
       })
       .otherwise(function(error) {
         console.log(error);
       });
-      model11.readyPromise
-      .then(model11 => {
-        this.modelRotation(model11, 5, 121.498920, 31.239405, -141.6177112372341);
-        scene.primitives.add(model11);
-      })
-      .otherwise(function(error) {
-        console.log(error);
-      });
+
     // 定位
     // viewer.zoomTo(jyds);
-    
+
     // 初始化选中和高光
     let selected = {
       feature: undefined,
@@ -233,10 +253,19 @@ class Map extends Component {
           model11={this.model11}
           scene={this.scene}
           arrs={this.state.arrs}
+          showModel11={this.state.showModel11}
+          handleHideBuildings={this.handleHideBuildings}
+          handleShowBuildings={this.handleShowBuildings}
         />
         {/* 详细信息 */}
         {this.state.showDetail ? (
-          <Card style={{ position: 'absolute' }} id={this.state.id} closeInfo={this.closeInfo} showHistory={this.state.showHistory} showhistory={this.showhistory}/>
+          <Card
+            style={{ position: 'absolute' }}
+            id={this.state.id}
+            closeInfo={this.closeInfo}
+            showHistory={this.state.showHistory}
+            showhistory={this.showhistory}
+          />
         ) : (
           <div></div>
         )}
