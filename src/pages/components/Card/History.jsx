@@ -16,7 +16,7 @@ class History extends Component {
 
   render() {
     return (
-      <div className="infobox" style={{width: 200, right: 260}}>
+      <div className="infobox" style={{width: 200, right: 310}}>
         <div
           style={{ position: 'absolute', right: 15, top: 10, cursor: 'pointer', zIndex: 10 }}
           onClick={this.props.closehistory}

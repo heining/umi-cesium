@@ -144,6 +144,8 @@ class Map extends Component {
       vrButton: false,
       infoBox: false,
     });
+    let layer0 = viewer.scene.imageryLayers.get(0);
+    layer0.gamma = 0.88;
     // 隐藏页面控件
     viewer._cesiumWidget._creditContainer.style.display = 'none';
     this.viewer = viewer;
@@ -229,7 +231,7 @@ class Map extends Component {
 
   render() {
     return (
-      <div id="cesiumContainer" style={{width: '100vw', height: '100vh'}}>
+      <div id="cesiumContainer" style={{ width: '100vw', height: '100vh' }}>
         <div
           style={{
             position: 'absolute',

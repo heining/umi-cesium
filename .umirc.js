@@ -48,7 +48,7 @@ export default {
   },
   // scripts: ['https://cesium.com/downloads/cesiumjs/releases/1.70.1/Build/Cesium/Cesium.js'],
   // 解决跨域问题的代理
-  proxy: {
+  proxy: {        
     '/api': {
       target: 'http://113.31.105.181:8180/',
       changeOrigin: true,

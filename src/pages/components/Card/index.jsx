@@ -12,18 +12,19 @@ let url = '';
 
 class Card extends Component {
   constructor(props) {
-    console.log(props)
+    console.log(props);
     super(props);
     this.state = {
       ...props,
       showDetail: true,
       showImg: false,
       showUpload: true,
-      files: []
+      files: [],
     };
   }
 
   componentDidMount() {
+    const that = this;
     // 每点击一块玻璃，进行一次请求(render)
     const urlencoded = new URLSearchParams();
     urlencoded.append('pic_id', this.props.id);
@@ -34,21 +35,47 @@ class Card extends Component {
       })
       .then(function(response) {
         if (response.result == 'success') {
-          this.setState({
-            showImg: true
-          })
-          url = response.url
-          console.log(url)
-        }else {
-          this.setState({
-            showImg: false
-          })
+          that.setState({
+            showImg: true,
+          });
+          url = response.url;
+          console.log(url);
+        } else {
+          that.setState({
+            showImg: false,
+          });
         }
       })
       .catch(function(error) {
         console.log(error);
       });
   }
+
+  sizeRender = () => {
+    const id = this.props.id;
+    console.log(id)
+    if (id.split('(')[1].split(')')[0] == 'C01') {
+      return (
+        <span>
+          3.322 m<sup>2</sup>
+        </span>
+      );
+    } else {
+      if (id.slice(1, 2) == 'L2') {
+        return (
+          <span>
+            1.595 m<sup>2</sup>
+          </span>
+        );
+      } else {
+        return (
+          <span>
+            0.715 m<sup>2</sup>
+          </span>
+        );
+      }
+    }
+  };
 
   render() {
     return (
@@ -61,9 +88,9 @@ class Card extends Component {
         </div>
         <div
           className="infoline"
-          style={{ justifyContent: 'flex-start', fontSize: 16, marginBottom: 15 }}
+          style={{fontSize: 16, marginBottom: 15 }}
         >
-          <span>编号：</span>
+          <span >编号：</span>  
           <span>{this.props.id}</span>
         </div>
         <div className="infoline">
@@ -72,9 +99,7 @@ class Card extends Component {
         </div>
         <div className="infoline">
           <span>尺寸：</span>
-          <span>
-            1.36 m<sup>2</sup>
-          </span>
+          {this.sizeRender()}
         </div>
         <div className="infoline">
           <span>材质：</span>
@@ -82,18 +107,20 @@ class Card extends Component {
         </div>
         <div className="infoline">
           <span>位置：</span>
-          <span>{this.props.id.slice(15, 17)}楼{this.props.id.slice(3, 6)}号</span>
+          <span>
+            {this.props.id.slice(15, 17)}楼{this.props.id.slice(3, 6)}号
+          </span>
         </div>
         <div className="infoline">
           <span>当前图片：</span>
           {this.state.showImg ? (
-            <Zmage src={require(url)} style={{ width: '75%', height: '75%' }} />
+            <Zmage src={require(url)} style={{ width: '70%', height: '70%' }} />
           ) : (
-            <Zmage src={require('@/assets/good.jpg')} style={{ width: '75%', height: '75%', }} />
+            <Zmage src={require('@/assets/good.jpg')} style={{ width: '70%', height: '70%' }} />
           )}
         </div>
         <div className="infoline">
-          <a onClick={this.props.showhistory} >历史图片</a>
+          <a onClick={this.props.showhistory}>历史图片</a>
         </div>
         <div className="infoline">
           <FileUpload id={this.props.id} />
@@ -103,13 +130,13 @@ class Card extends Component {
           <div style={{ display: 'flex', justifyContent: 'center', width: 180, margin: 10 }}>
             {/* 二维码 */}
             <QRCode
-              value="http://www.runoob.com" // 生成二维码的内容
+              value={`http://lesuidao.cn/smart_city_mobile/#/windowdetail?code=${this.props.id}&status=ok`}// 生成二维码的内容
               size={88} // 二维码的大小
               fgColor="#000000" // 二维码的颜色
             />
           </div>
         </div>
-        <span style={{ width: 200, textAlign: 'center'}}>(手机扫码查看)</span>
+        <span style={{ width: 200, textAlign: 'center' }}>(手机扫码查看)</span>
       </div>
     );
   }

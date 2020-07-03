@@ -241,7 +241,7 @@ class FloorSelect extends Component {
       detected3,
       notdetected5,
       notdetected6,
-      notdetected7
+      notdetected7,
     });
     detected1.show = true;
     detected2.show = true;
@@ -264,14 +264,17 @@ class FloorSelect extends Component {
   };
 
   handleHidePin = () => {
-    let {detected1, detected2, detected3, notdetected5, notdetected6, notdetected7} = this.state;
+    let { detected1, detected2, detected3, notdetected5, notdetected6, notdetected7 } = this.state;
     detected1.show = false;
     detected2.show = false;
     detected3.show = false;
     notdetected5.show = false;
     notdetected6.show = false;
     notdetected7.show = false;
-  }
+    this.setState({
+      showCheckStatus: false
+    })
+  };
 
   render() {
     return (
@@ -346,7 +349,7 @@ class FloorSelect extends Component {
           )}
           <br />
           <Input
-            style={{ width: 300, marginTop: 20 }}
+            style={{ width: 250, marginTop: 20, display: 'block' }}
             placeholder="请输入幕墙编号"
             allowClear
             onChange={this.handleChange}
@@ -368,7 +371,14 @@ class FloorSelect extends Component {
           <Radio value={1} style={{ color: 'white' }} onClick={this.handleCheck}>
             检测状态
           </Radio>
-          <Radio style={{ color: 'white' }} value={2} onClick={() => {this.props.handleHideBuildings() ; this.handleHidePin()}}>
+          <Radio
+            style={{ color: 'white' }}
+            value={2}
+            onClick={() => {
+              this.props.handleHideBuildings();
+              this.handleHidePin();
+            }}
+          >
             隐藏楼群
           </Radio>
           <Radio style={{ color: 'white' }} value={3} onClick={this.props.handleShowBuildings}>
