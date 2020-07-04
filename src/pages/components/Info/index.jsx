@@ -6,7 +6,7 @@
 import React, { Component } from 'react';
 import request from 'umi-request';
 import * as Cesium from 'cesium';
-import { Select, Input, Radio } from 'antd';
+import { Select, Input, Radio, Button } from 'antd';
 import '../Card/index.css';
 
 const { Option } = Select;
@@ -19,7 +19,7 @@ let floorNum = '';
 const pinBuilder = new Cesium.PinBuilder();
 const selectedEntity = new Cesium.Entity();
 
-class FloorSelect extends Component {
+class Info extends Component {
   constructor(props) {
     console.log(props);
     super(props);
@@ -292,9 +292,7 @@ class FloorSelect extends Component {
       })
       .then(function(response) {
         if (response.result == 'success') {
-        
         } else {
-         
         }
       })
       .catch(function(error) {
@@ -306,7 +304,7 @@ class FloorSelect extends Component {
   // setColor = (target, glass, color) => {
   //   target.style = new Cesium.Cesium3DTileStyle({
   //     // show: true,
-  //     color: { 
+  //     color: {
   //       evaluateColor: function(feature, result) {
   //         const featureId = feature.getProperty('id');
   //         if (featureId.includes(glass)) {
@@ -319,16 +317,120 @@ class FloorSelect extends Component {
   //   });
   // };
 
+  flyTo = (lon, lat, hight) => {
+    // 跳转
+    this.props.viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(lon, lat, hight), // 设置位置
+      orientation: {
+        heading: Cesium.Math.toRadians(-20), // 方向
+        pitch: Cesium.Math.toRadians(-20), // 倾斜角度
+        roll: 0,
+      },
+      duration: 5, // 设置飞行持续时间，默认会根据距离来计算
+      complete: function() {
+        // 到达位置后执行的回调函数
+        console.log('到达目的地');
+      },
+    });
+  };
+
+  handleWest = () => {
+    this.flyTo(121.499710, 31.241044, 80)
+  };
+
+  handleEath = () => {
+    this.flyTo(121.499436, 31.241592, 80)
+  };
+
+  handleSouth = () => {
+    this.flyTo(121.499796, 31.241291, 80)
+  };
+
+  handleNorth = () => {
+    this.flyTo(121.499337, 31.241021, 80)
+  };
+
+ 
   render() {
     return (
       <div className="infobox">
-        <div className="infoline" style={{ marginBottom: 10 }}>
+        <div className="infoline" style={{ marginBottom: 10, float: 'left', width: 150 }}>
           交银大厦
         </div>
-        <div>
+        {/* 楼宇信息 */}
+        <div
+          className="infoline"
+          style={{ marginBottom: 10, textDecoration: 'underline', width: 150 }}
+          onClick={this.props.handleShowBuildInfo}
+        >
+          建筑幕墙信息
+        </div>
+
+        {/* 新增功能，date: 2020-07-02 */}
+        <div style={{ textAlign: 'left' }}>
+          <Radio.Group
+            onChange={this.onChange}
+            value={this.state.value}
+            style={{ color: 'white', marginTop: 10 }}
+          >
+            <Radio style={{ color: 'white' }} value={1} onClick={this.props.handleShowBuildings}>
+              显示楼群
+            </Radio>
+            <Radio
+              style={{ color: 'white' }}
+              value={2}
+              onClick={() => {
+                this.props.handleHideBuildings();
+                this.handleHidePin();
+              }}
+            >
+              隐藏楼群
+            </Radio>
+            <Radio value={3} style={{ color: 'white' }} onClick={this.handleCheck}>
+              检测状态
+            </Radio>
+          </Radio.Group>
+          {this.state.showCheckStatus ? (
+            <>
+              <div className="colorline" style={{ justifyContent: 'flex-start' }}>
+                <div style={{ display: 'flex', alignItems: 'center', float: 'left' }}>
+                  <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
+                  <span style={{ fontSize: 12, marginLeft: 10 }}>未检测</span>
+                </div>
+              </div>
+              <div className="colorline" style={{ justifyContent: 'flex-start' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <span className="colorbox" style={{ backgroundColor: 'green' }}></span>
+                  <span style={{ fontSize: 12, marginLeft: 10 }}>已检测</span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div></div>
+          )}
+        </div>
+        {/* 新增功能, date: 2020-07-04, 立面信息 */}
+        <div className="infoline" style={{ marginTop: 15 }}>
+          <label>方位</label>
+          <Button ghost style={{ marginRight: 15, marginLeft: 20 }} onClick={this.handleEast}>
+            东
+          </Button>
+          <Button ghost style={{ marginRight: 15 }} onClick={this.handleWest}>
+            西
+          </Button>
+          <Button ghost style={{ marginRight: 15 }} onClick={this.handleSouth}>
+            南
+          </Button>
+          <Button ghost onClick={this.handleNorth}>
+            北
+          </Button>
+        </div>
+
+        <div style={{ marginTop: 15 }}>
+          <label style={{ float: 'left', marginRight: 10 }}>幕墙位置</label>
           <Select
             placeholder={'请选择分类'}
-            style={{ width: 100, marginRight: 20, float: 'left' }}
+            style={{ width: 100, marginRight: 20, float: 'left', background: 'transparent ' }}
             onChange={this.handleStyleChange}
           >
             <Option value="C">幕墙类型</Option>
@@ -392,7 +494,7 @@ class FloorSelect extends Component {
           )}
           <br />
           <Input
-            style={{ width: 250, marginTop: 20, display: 'block' }}
+            style={{ width: 250, marginTop: 30, display: 'block' }}
             placeholder="请输入幕墙编号"
             allowClear
             onChange={this.handleChange}
@@ -406,65 +508,26 @@ class FloorSelect extends Component {
           </div>
         </div>
 
-        {/* 新增功能，date: 2020-07-02 */}
-        <Radio.Group
-          onChange={this.onChange}
-          value={this.state.value}
-          style={{ color: 'white', marginTop: 10 }}
-        >
-          <Radio value={1} style={{ color: 'white' }} onClick={this.handleCheck}>
-            检测状态
-          </Radio>
-          <Radio
-            style={{ color: 'white' }}
-            value={2}
-            onClick={() => {
-              this.props.handleHideBuildings();
-              this.handleHidePin();
-            }}
-          >
-            隐藏楼群
-          </Radio>
-          <Radio style={{ color: 'white' }} value={3} onClick={this.props.handleShowBuildings}>
-            显示楼群
-          </Radio>
-        </Radio.Group>
-        {this.state.showCheckStatus ? (
-          <>
-            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
-              <div style={{ display: 'flex', alignItems: 'center', float: 'left' }}>
-                <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
-                <span style={{ fontSize: 12, marginLeft: 10 }}>未检测</span>
-              </div>
-            </div>
-            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span className="colorbox" style={{ backgroundColor: 'green' }}></span>
-                <span style={{ fontSize: 12, marginLeft: 10 }}>已检测</span>
-              </div>
-            </div>
-          </>
-        ) : (
-          <div></div>
-        )}
-
         {/* 新增功能, date: 2020-07-04 */}
-        <Select
-          placeholder={'问题分类'}
-          style={{ width: 200, marginTop: 15 }}
-          onChange={this.handleProblemChange}
-        >
-          <Option value="1">幕墙面板问题</Option>
-          <Option value="2">外露构件问题</Option>
-          <Option value="3">承力构件、连接件、连接螺栓问题</Option>
-          <Option value="4">硅酮密封胶、胶条问题</Option>
-          <Option value="5">开启部分问题</Option>
-          <Option value="6">幕墙排水系统问题</Option>
-          <Option value="7">硅酮结构密封胶、粘接性能问题</Option>
-        </Select>
+        <div className="infoline" style={{ marginTop: 15 }}>
+          <label>幕墙问题</label>
+          <Select
+            placeholder={'问题分类'}
+            style={{ width: 200, marginTop: 10 }}
+            onChange={this.handleProblemChange}
+          >
+            <Option value="1">幕墙面板问题</Option>
+            <Option value="2">外露构件问题</Option>
+            <Option value="3">承力构件、连接件、连接螺栓问题</Option>
+            <Option value="4">硅酮密封胶、胶条问题</Option>
+            <Option value="5">开启部分问题</Option>
+            <Option value="6">幕墙排水系统问题</Option>
+            <Option value="7">硅酮结构密封胶、粘接性能问题</Option>
+          </Select>
+        </div>
       </div>
     );
   }
 }
 
-export default FloorSelect;
+export default Info;

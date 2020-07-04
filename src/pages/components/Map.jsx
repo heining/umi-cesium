@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import * as Cesium from 'cesium';
-import FloorSelect from './FloorSelect/index';
+import Info from './Info/index';
+import BuildInfo from './Info/BuildInfo';
+import DetailInfo from './Info/DetailInfo';
 import Card from './Card/index';
 import History from './Card/History';
 import 'cesium/Source/Widgets/widgets.css';
@@ -11,11 +13,13 @@ class Map extends Component {
   constructor() {
     super();
     this.state = {
+      id: 0,
+      arrs: [],
       showDetail: false,
       showHistory: false,
       showBuildings: true,
-      id: 0,
-      arrs: [],
+      showBuildInfo: false,
+      showDetailInfo: false   
     };
   }
 
@@ -119,8 +123,6 @@ class Map extends Component {
   };
 
   handleShowBuildings = () => {
-    // this.model11.show = true;
-    // this.scene.primitives.add(this.model11);
     const model11 = new Cesium.Cesium3DTileset({
       url: 'http://cdn.lesuidao.cn/ljz11/tileset.json',
       maximumScreenSpaceError: 160, //细化程度的最大屏幕空间错误（提高清晰度）
@@ -136,6 +138,31 @@ class Map extends Component {
         console.log(error);
       });
   };
+
+  handleShowBuildInfo = () => {
+    console.log('点击了')
+    this.setState({
+      showBuildInfo: true
+    })
+  }
+
+  handleHideBuildInfo = () => {
+    this.setState({
+      showBuildInfo: false
+    })
+  }
+
+  // handleShowDetailInfo = () => {
+  //   this.setState({
+  //     showDetailInfo: true
+  //   })
+  // }
+
+  // handleHideDetailInfo = () => {
+  //   this.setState({
+  //     showDetailInfo: false
+  //   })
+  // }
 
   componentDidMount() {
     // let script = document.createElement('script');
@@ -245,7 +272,7 @@ class Map extends Component {
         >
           内部信息，请勿外传！
         </div>
-        <FloorSelect
+        <Info
           style={{ position: 'absolute' }}
           viewer={this.viewer}
           jyds={this.jyds}
@@ -255,6 +282,8 @@ class Map extends Component {
           showModel11={this.state.showModel11}
           handleHideBuildings={this.handleHideBuildings}
           handleShowBuildings={this.handleShowBuildings}
+          handleShowBuildInfo={this.handleShowBuildInfo}
+          // handleShowDetailInfo={this.handleShowDetailInfo}
         />
         {/* 详细信息 */}
         {this.state.showDetail ? (
@@ -270,6 +299,12 @@ class Map extends Component {
         )}
         {/* 历史图片 */}
         {this.state.showHistory ? <History closehistory={this.closehistory} /> : <div></div>}
+
+        {/* 建筑幕墙信息 */}
+        {this.state.showBuildInfo ? <BuildInfo handleHideBuildInfo={this.handleHideBuildInfo}/> : <div></div>}
+
+        {/* 幕墙详细信息 */}
+        {this.state.showDetailInfo ? <DetailInfo handleHideDetailInfo={this.handleHideDetailInfo}/> : <div></div>}
       </div>
     );
   }
