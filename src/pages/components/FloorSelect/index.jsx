@@ -4,6 +4,7 @@
  */
 
 import React, { Component } from 'react';
+import request from 'umi-request';
 import * as Cesium from 'cesium';
 import { Select, Input, Radio } from 'antd';
 import '../Card/index.css';
@@ -65,7 +66,7 @@ class FloorSelect extends Component {
       floorArr,
     });
     // 跳转
-    this.props.viewer.flyTo(this.props.model11);
+    this.props.viewer.flyTo(this.props.jyds);
   };
 
   handleCChange = e => {
@@ -211,22 +212,22 @@ class FloorSelect extends Component {
   };
 
   // 检测状态的颜色分类
-  floorcolor = target => {
-    target.style = new Cesium.Cesium3DTileStyle({
-      show: true,
-      color: {
-        conditions: [
-          // ['${floor} >= 70', "color('red')"],
-          // ['${floor} === 40', "color('red')"],
-          // ['${floor} === 20', "color('orange')"],
-          ['true', "color('white')"],
-        ],
-      },
-    });
-    // this.props.model11.style = new Cesium.Cesium3DTileStyle({
-    //   color: "color('Cesium.Color.GREEN')",
-    // });
-  };
+  // floorcolor = target => {
+  //   target.style = new Cesium.Cesium3DTileStyle({
+  //     show: true,
+  //     color: {
+  //       conditions: [
+  //         // ['${floor} >= 70', "color('red')"],
+  //         // ['${floor} === 40', "color('red')"],
+  //         // ['${floor} === 20', "color('orange')"],
+  //         ['true', "color('white')"],
+  //       ],
+  //     },
+  //   });
+  //   // this.props.model11.style = new Cesium.Cesium3DTileStyle({
+  //   //   color: "color('Cesium.Color.GREEN')",
+  //   // });
+  // };
 
   handleCheck = () => {
     const detected1 = this.createPin(121.503149, 31.236429, '已检测', 'GREEN', 492); // 上海环球金融中心
@@ -243,13 +244,14 @@ class FloorSelect extends Component {
       notdetected6,
       notdetected7,
     });
+    console.log(this.state.detected1);
     detected1.show = true;
     detected2.show = true;
     detected3.show = true;
     notdetected5.show = true;
     notdetected6.show = true;
     notdetected7.show = true;
-    this.floorcolor(this.props.model11);
+    // this.floorcolor(this.props.model11);
     this.props.viewer.flyTo(this.props.model11, {
       duration: 3,
       offset: new Cesium.HeadingPitchRange(
@@ -265,6 +267,7 @@ class FloorSelect extends Component {
 
   handleHidePin = () => {
     let { detected1, detected2, detected3, notdetected5, notdetected6, notdetected7 } = this.state;
+    console.log(detected1);
     detected1.show = false;
     detected2.show = false;
     detected3.show = false;
@@ -272,9 +275,49 @@ class FloorSelect extends Component {
     notdetected6.show = false;
     notdetected7.show = false;
     this.setState({
-      showCheckStatus: false
-    })
+      showCheckStatus: false,
+    });
   };
+
+  // 7个问题，7种颜色
+  handleProblemChange = e => {
+    console.log(e);
+    const that = this;
+    // 请求问题玻璃的所有id
+    const urlencoded = new URLSearchParams();
+    urlencoded.append('pic_id', this.props.id);
+    request
+      .post('/api/v1/get/picture/url', {
+        data: urlencoded,
+      })
+      .then(function(response) {
+        if (response.result == 'success') {
+        
+        } else {
+         
+        }
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
+  };
+
+  // // 设置颜色,其中target：jyds, glass: 问题玻璃集合, color： 颜色集合
+  // setColor = (target, glass, color) => {
+  //   target.style = new Cesium.Cesium3DTileStyle({
+  //     // show: true,
+  //     color: { 
+  //       evaluateColor: function(feature, result) {
+  //         const featureId = feature.getProperty('id');
+  //         if (featureId.includes(glass)) {
+  //           return Cesium.Color.clone(Cesium.Color.color, result);
+  //         } else {
+  //           return Cesium.Color.clone(Cesium.Color.WHITE, result);
+  //         }
+  //       },
+  //     },
+  //   });
+  // };
 
   render() {
     return (
@@ -362,6 +405,7 @@ class FloorSelect extends Component {
             其中L2:幕墙中的小层, N072: 每块幕墙的序列号, C74: 幕墙类型, GF013: 幕墙楼层
           </div>
         </div>
+
         {/* 新增功能，date: 2020-07-02 */}
         <Radio.Group
           onChange={this.onChange}
@@ -403,6 +447,21 @@ class FloorSelect extends Component {
         ) : (
           <div></div>
         )}
+
+        {/* 新增功能, date: 2020-07-04 */}
+        <Select
+          placeholder={'问题分类'}
+          style={{ width: 200, marginTop: 15 }}
+          onChange={this.handleProblemChange}
+        >
+          <Option value="1">幕墙面板问题</Option>
+          <Option value="2">外露构件问题</Option>
+          <Option value="3">承力构件、连接件、连接螺栓问题</Option>
+          <Option value="4">硅酮密封胶、胶条问题</Option>
+          <Option value="5">开启部分问题</Option>
+          <Option value="6">幕墙排水系统问题</Option>
+          <Option value="7">硅酮结构密封胶、粘接性能问题</Option>
+        </Select>
       </div>
     );
   }

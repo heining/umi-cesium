@@ -119,8 +119,22 @@ class Map extends Component {
   };
 
   handleShowBuildings = () => {
-    this.model11.show = true;
-    this.scene.primitives.add(this.model11);
+    // this.model11.show = true;
+    // this.scene.primitives.add(this.model11);
+    const model11 = new Cesium.Cesium3DTileset({
+      url: 'http://cdn.lesuidao.cn/ljz11/tileset.json',
+      maximumScreenSpaceError: 160, //细化程度的最大屏幕空间错误（提高清晰度）
+      maximumMemoryUsage: 1024,
+    });
+    this.model11 = model11;
+    model11.readyPromise
+      .then(model11 => {
+        this.modelRotation(model11, 5, 121.49892, 31.239405, -141.6177112372341);
+        this.scene.primitives.add(model11);
+      })
+      .otherwise(function(error) {
+        console.log(error);
+      });
   };
 
   componentDidMount() {
@@ -155,21 +169,6 @@ class Map extends Component {
     // 场景的后期处理
     viewer.scene.postProcessStages.fxaa.enabled = true;
     // 添加贴图
-    const model11 = new Cesium.Cesium3DTileset({
-      url: 'http://cdn.lesuidao.cn/ljz11/tileset.json',
-      maximumScreenSpaceError: 160, //细化程度的最大屏幕空间错误（提高清晰度）
-      maximumMemoryUsage: 1024,
-    });
-    this.model11 = model11;
-    model11.readyPromise
-      .then(model11 => {
-        this.modelRotation(model11, 5, 121.49892, 31.239405, -141.6177112372341);
-        scene.primitives.add(model11);
-      })
-      .otherwise(function(error) {
-        console.log(error);
-      });
-
     const jyds = new Cesium.Cesium3DTileset({
       url: 'http://cdn.lesuidao.cn/8/tileset.json',
       maximumScreenSpaceError: 4, //细化程度的最大屏幕空间错误（提高清晰度）
