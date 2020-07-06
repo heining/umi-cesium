@@ -16,35 +16,53 @@ class Card extends Component {
     super(props);
     this.state = {
       ...props,
+      logID: 0,
       showDetail: true,
       showImg: false,
       showUpload: true,
       files: [],
     };
+    console.log(this.props.id)
   }
 
   componentDidMount() {
+    let glassID = 0;
+    let logID = 0;
     const that = this;
-    // 每点击一块玻璃，进行一次请求(render)
-    const urlencoded = new URLSearchParams();
-    urlencoded.append('pic_id', this.props.id);
-    urlencoded.append('title', 'pictest');
+    // 玻璃ID换取数据库glass的ID
+    const formData = new FormData();
+    formData.append('pic_id', this.props.id);
     request
-      .post('/api/v1/get/picture/url', {
-        data: urlencoded,
+      .post('http://113.31.105.181:8180/api/v1/get/glass', {
+        data: formData,
       })
       .then(function(response) {
-        if (response.result == 'success') {
-          that.setState({
-            showImg: true,
-          });
-          url = response.url;
-          console.log(url);
-        } else {
-          that.setState({
-            showImg: false,
-          });
-        }
+        glassID = response.id;
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
+      // 数据库glass的ID换取log(历史记录)的ID
+      request
+      .post('/api/v1/get/log', {
+        data: glassID,
+      })
+      .then(function(response) {
+        logID = response.id
+        this.setState({
+          logID
+        })
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
+      // 通过log(历史记录)的ID查询图片
+      request
+      .post('/media/api/v1/get/picture', {
+        data: logID,
+      })
+      .then(function(response) {
+        url = response.my_file
       })
       .catch(function(error) {
         console.log(error);
@@ -53,7 +71,6 @@ class Card extends Component {
 
   sizeRender = () => {
     const id = this.props.id;
-    console.log(id)
     if (id.split('(')[1].split(')')[0] == 'C01') {
       return (
         <span>
@@ -74,7 +91,58 @@ class Card extends Component {
           </span>
         );
       }
-    }
+    } 
+    // if(id.slice(1, 2) == 'L1') {
+    //   if(id.split('(')[1].split(')')[0] == 'C001') {
+    //     return (
+    //           <span>
+    //             3.5 m<sup>2</sup>
+    //           </span>
+    //         );
+    //   }else if(id.split('(')[1].split(')')[0] >= 'C002' && id.split('(')[1].split(')')[0] <= 'C034') {
+    //     return (
+    //       <span>
+    //         0.75 m<sup>2</sup>
+    //       </span>
+    //     );
+    //   }else if(id.split('(')[1].split(')')[0] >= 'C035' && id.split('(')[1].split(')')[0] <= 'C039') {
+    //     return (
+    //       <span>
+    //         7 m<sup>2</sup>
+    //       </span>
+    //     );
+    //   }else if(id.split('(')[1].split(')')[0] >= 'C040' && id.split('(')[1].split(')')[0] <= 'C051') {
+    //     return (
+    //       <span>
+    //         6.15 m<sup>2</sup>
+    //       </span>
+    //     );
+    //   }else if(id.split('(')[1].split(')')[0] >= 'C052' && id.split('(')[1].split(')')[0] <= 'C055') {
+    //     return (
+    //       <span>
+    //         5.3 m<sup>2</sup>
+    //       </span>
+    //     );
+    //   }else if(id.split('(')[1].split(')')[0] == 'C056') {
+    //     return (
+    //       <span>
+    //         3.5 m<sup>2</sup>
+    //       </span>
+    //     );
+    //   }else if(id.split('(')[1].split(')')[0] >= 'C057' && id.split('(')[1].split(')')[0] <= 'C088') {
+    //     return (
+    //       <span>
+    //         0.75 m<sup>2</sup>
+    //       </span>
+    //     );
+    //   }else if(id.split('(')[1].split(')')[0] >= 'C089' && id.split('(')[1].split(')')[0] <= 'C094') {
+    //     return (
+    //       <span>
+    //         7 m<sup>2</sup>
+    //       </span>
+    //     );
+    //   }
+    // }
   };
 
   render() {
@@ -88,7 +156,7 @@ class Card extends Component {
         </div>
         <div
           className="infoline"
-          style={{fontSize: 16, marginBottom: 15 }}
+          style={{fontSize: 16, marginBottom: 15}}
         >
           <span >编号：</span>  
           <span>{this.props.id}</span>
@@ -123,11 +191,11 @@ class Card extends Component {
           <a onClick={this.props.showhistory}>历史图片</a>
         </div>
         <div className="infoline">
-          <FileUpload id={this.props.id} />
+          <FileUpload id={this.props.id} logID={this.state.logID}/>
         </div>
         <div className="infoline">
           <span>详细信息：</span>
-          <div style={{ display: 'flex', justifyContent: 'center', width: 180, margin: 10 }}>
+          <div style={{ display: 'flex', justifyContent: 'left', width: 180, margin: 10 }}>
             {/* 二维码 */}
             <QRCode
               value={`http://lesuidao.cn/smart_city_mobile/#/windowdetail?code=${this.props.id}&status=ok`}// 生成二维码的内容

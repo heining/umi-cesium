@@ -27,7 +27,7 @@ let data = [
   { title: '2019-02-08', content: '李明' },
 ];
 
-class BuildInfo extends Component {
+class DetailInfo extends Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -54,4 +54,4 @@ class BuildInfo extends Component {
   }
 }
 
-export default BuildInfo;
+export default DetailInfo;

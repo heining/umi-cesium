@@ -8,18 +8,20 @@ import History from './Card/History';
 import 'cesium/Source/Widgets/widgets.css';
 
 const arrs = [];
+const South = [];
 
 class Map extends Component {
   constructor() {
     super();
     this.state = {
-      id: 0,
+      id: '',
+      WFid: '',
       arrs: [],
       showDetail: false,
       showHistory: false,
       showBuildings: true,
       showBuildInfo: false,
-      showDetailInfo: false   
+      showDetailInfo: false,
     };
   }
 
@@ -57,6 +59,8 @@ class Map extends Component {
             Cesium.Color.clone(pick.color, highlighted.originalColor);
             if (name.includes('GF')) {
               pick.color = Cesium.Color.YELLOW;
+            } else if (name.includes('WF')) {
+              pick.color = Cesium.Color.BLUE;
             }
           }
         } catch (error) {
@@ -82,6 +86,7 @@ class Map extends Component {
       if (Cesium.defined(pick)) {
         // 根据每块玻璃的ID区分
         const name = pick.getProperty('id');
+        console.log(name);
         if (name.includes('GF')) {
           selected.feature = pick;
           if (pick === highlighted.feature) {
@@ -95,6 +100,18 @@ class Map extends Component {
             id: name,
             showHistory: false,
           });
+        } else if (name.includes('WF')) {
+          selected.feature = pick;
+          if (pick === highlighted.feature) {
+            Cesium.Color.clone(highlighted.originalColor, selected.originalColor);
+            highlighted.feature = undefined;
+          } else {
+            Cesium.Color.clone(pick.color, selected.originalColor);
+          }
+          this.setState({
+            WFid: name,
+          });
+          console.log(this.state.WFid);
         }
       }
     }
@@ -140,29 +157,32 @@ class Map extends Component {
   };
 
   handleShowBuildInfo = () => {
-    console.log('点击了')
     this.setState({
-      showBuildInfo: true
-    })
-  }
+      showBuildInfo: true,
+    });
+  };
 
   handleHideBuildInfo = () => {
     this.setState({
-      showBuildInfo: false
-    })
-  }
+      showBuildInfo: false,
+    });
+  };
 
-  // handleShowDetailInfo = () => {
-  //   this.setState({
-  //     showDetailInfo: true
-  //   })
-  // }
+  handleShowDetailInfo = () => {
+    this.setState({
+      showDetailInfo: true,
+    });
+  };
 
   // handleHideDetailInfo = () => {
   //   this.setState({
   //     showDetailInfo: false
   //   })
   // }
+
+  flyTO = target => {
+    this.viewer.flyTo(target);
+  };
 
   componentDidMount() {
     // let script = document.createElement('script');
@@ -198,7 +218,7 @@ class Map extends Component {
     // 添加贴图
     const jyds = new Cesium.Cesium3DTileset({
       url: 'http://cdn.lesuidao.cn/8/tileset.json',
-      maximumScreenSpaceError: 4, //细化程度的最大屏幕空间错误（提高清晰度）
+      maximumScreenSpaceError: 16, //细化程度的最大屏幕空间错误（提高清晰度）
       maximumMemoryUsage: 1024,
     });
     this.jyds = jyds;
@@ -212,9 +232,11 @@ class Map extends Component {
               const featureId = feature.getProperty('id');
               if (featureId.includes('GF')) {
                 arrs.push(featureId);
-                that.setState({
-                  arrs,
-                });
+                // that.setState({
+                //   arrs,
+                // });
+                // 直接赋值
+                that.state.arrs = arrs;
               }
               return Cesium.Color.clone(Cesium.Color.WHITE, result);
             },
@@ -226,6 +248,10 @@ class Map extends Component {
       .otherwise(function(error) {
         console.log(error);
       });
+
+    that.setState({
+      arrs,
+    });
 
     // 定位
     // viewer.zoomTo(jyds);
@@ -283,7 +309,6 @@ class Map extends Component {
           handleHideBuildings={this.handleHideBuildings}
           handleShowBuildings={this.handleShowBuildings}
           handleShowBuildInfo={this.handleShowBuildInfo}
-          // handleShowDetailInfo={this.handleShowDetailInfo}
         />
         {/* 详细信息 */}
         {this.state.showDetail ? (
@@ -301,10 +326,21 @@ class Map extends Component {
         {this.state.showHistory ? <History closehistory={this.closehistory} /> : <div></div>}
 
         {/* 建筑幕墙信息 */}
-        {this.state.showBuildInfo ? <BuildInfo handleHideBuildInfo={this.handleHideBuildInfo}/> : <div></div>}
+        {this.state.showBuildInfo ? (
+          <BuildInfo
+            handleHideBuildInfo={this.handleHideBuildInfo}
+            handleShowDetailInfo={this.handleShowDetailInfo}
+          />
+        ) : (
+          <div></div>
+        )}
 
         {/* 幕墙详细信息 */}
-        {this.state.showDetailInfo ? <DetailInfo handleHideDetailInfo={this.handleHideDetailInfo}/> : <div></div>}
+        {this.state.showDetailInfo ? (
+          <DetailInfo handleHideDetailInfo={this.handleHideDetailInfo} />
+        ) : (
+          <div></div>
+        )}
       </div>
     );
   }

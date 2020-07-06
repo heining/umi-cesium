@@ -16,8 +16,14 @@ let Cgrass = [];
 let GFgrass = [];
 let className = '';
 let floorNum = '';
+let Nnum = '';
+let eArrs = [];
+let nArrs = [];
+let sArrs = [];
+let wArrs = [];
 const pinBuilder = new Cesium.PinBuilder();
 const selectedEntity = new Cesium.Entity();
+const color = ['red', 'Orange', 'yello', 'green', 'black', 'blue', 'purple']
 
 class Info extends Component {
   constructor(props) {
@@ -25,7 +31,8 @@ class Info extends Component {
     super(props);
     this.state = {
       id: '',
-      arrs: [],
+      // ids: '',
+      // arrs: [],
       style: '',
       styleName: '',
       floor: '',
@@ -47,10 +54,24 @@ class Info extends Component {
   handleStyleChange = e => {
     console.log(e);
     const arrs = this.props.arrs;
+    eArrs = [];
+    nArrs = [];
+    sArrs = [];
+    wArrs = [];
     if (arrs) {
       arrs.map((item, index) => {
         className = item.split('(')[1].split(')')[0];
         floorNum = item.slice(12, 17);
+        Nnum = item.slice(4, 6)
+        if(Nnum >= 70 && Nnum <= 107) {
+          eArrs.push(item)
+        }else if(Nnum >= 1  && Nnum <= 15) {
+          nArrs.push(item)
+        }else if(Nnum >= 54  && Nnum <= 69) {
+          sArrs.push(item)
+        }else {
+          wArrs.push(item)
+        }
         // floorNum = item.split(')'[1]);
         styleArr.push(className);
         floorArr.push(floorNum);
@@ -198,18 +219,18 @@ class Info extends Component {
     });
   };
 
-  // 画布
-  createPin = (lon, lat, shu, colorpin, height) => {
-    return this.props.viewer.entities.add({
-      // name: name,
-      show: false,
-      position: Cesium.Cartesian3.fromDegrees(lon, lat, height),
-      billboard: {
-        image: pinBuilder.fromText(shu, Cesium.Color[colorpin], 88).toDataURL(),
-        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-      },
-    });
-  };
+  // // 画布
+  // createPin = (lon, lat, shu, colorpin, height) => {
+  //   return this.props.viewer.entities.add({
+  //     // name: name,
+  //     show: false,
+  //     position: Cesium.Cartesian3.fromDegrees(lon, lat, height),
+  //     billboard: {
+  //       image: pinBuilder.fromText(shu, Cesium.Color[colorpin], 88).toDataURL(),
+  //       verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+  //     },
+  //   });
+  // };
 
   // 检测状态的颜色分类
   // floorcolor = target => {
@@ -229,128 +250,161 @@ class Info extends Component {
   //   // });
   // };
 
-  handleCheck = () => {
-    const detected1 = this.createPin(121.503149, 31.236429, '已检测', 'GREEN', 492); // 上海环球金融中心
-    const detected2 = this.createPin(121.498059, 31.241105, '已检测', 'GREEN', 170); // 中国平安金融大厦
-    const detected3 = this.createPin(121.495987, 31.235635, '已检测', 'GREEN', 180); //花旗集团大厦
-    const notdetected5 = this.createPin(121.504343, 31.241308, '待检测', 'RED', 86); // 华夏银行大厦
-    const notdetected6 = this.createPin(121.497781, 31.238941, '待检测', 'RED', 250); //国金中心
-    const notdetected7 = this.createPin(121.495841, 31.23787, '待检测', 'RED', 130); //香格里拉大酒店
-    this.setState({
-      detected1,
-      detected2,
-      detected3,
-      notdetected5,
-      notdetected6,
-      notdetected7,
-    });
-    console.log(this.state.detected1);
-    detected1.show = true;
-    detected2.show = true;
-    detected3.show = true;
-    notdetected5.show = true;
-    notdetected6.show = true;
-    notdetected7.show = true;
-    // this.floorcolor(this.props.model11);
-    this.props.viewer.flyTo(this.props.model11, {
-      duration: 3,
-      offset: new Cesium.HeadingPitchRange(
-        -10,
-        -0.5,
-        this.props.model11.boundingSphere.radius * 1.6,
-      ),
-    });
-    this.setState({
-      showCheckStatus: true,
-    });
-  };
+  // handleCheck = () => {
+  //   const detected1 = this.createPin(121.503149, 31.236429, '已检测', 'GREEN', 492); // 上海环球金融中心
+  //   const detected2 = this.createPin(121.498059, 31.241105, '已检测', 'GREEN', 170); // 中国平安金融大厦
+  //   const detected3 = this.createPin(121.495987, 31.235635, '已检测', 'GREEN', 180); //花旗集团大厦
+  //   const notdetected5 = this.createPin(121.504343, 31.241308, '待检测', 'RED', 86); // 华夏银行大厦
+  //   const notdetected6 = this.createPin(121.497781, 31.238941, '待检测', 'RED', 250); //国金中心
+  //   const notdetected7 = this.createPin(121.495841, 31.23787, '待检测', 'RED', 130); //香格里拉大酒店
+  //   this.setState({
+  //     detected1,
+  //     detected2,
+  //     detected3,
+  //     notdetected5,
+  //     notdetected6,
+  //     notdetected7,
+  //   },);
+  //   detected1.show = true;
+  //   detected2.show = true;
+  //   detected3.show = true;
+  //   notdetected5.show = true;
+  //   notdetected6.show = true;
+  //   notdetected7.show = true;
+  //   // this.floorcolor(this.props.model11);
+  //   this.props.viewer.flyTo(this.props.model11, {
+  //     duration: 3,
+  //     offset: new Cesium.HeadingPitchRange(
+  //       -10,
+  //       -0.5,
+  //       this.props.model11.boundingSphere.radius * 1.6,
+  //     ),
+  //   });
+  //   this.setState({
+  //     showCheckStatus: true,
+  //   });
+  // };
 
-  handleHidePin = () => {
-    let { detected1, detected2, detected3, notdetected5, notdetected6, notdetected7 } = this.state;
-    console.log(detected1);
-    detected1.show = false;
-    detected2.show = false;
-    detected3.show = false;
-    notdetected5.show = false;
-    notdetected6.show = false;
-    notdetected7.show = false;
-    this.setState({
-      showCheckStatus: false,
-    });
-  };
+  // handleHidePin = () => {
+  //   let { detected1, detected2, detected3, notdetected5, notdetected6, notdetected7 } = this.state;
+  //   console.log(detected1);
+  //   detected1.show = false;
+  //   detected2.show = false;
+  //   detected3.show = false;
+  //   notdetected5.show = false;
+  //   notdetected6.show = false;
+  //   notdetected7.show = false;
+  //   this.setState({
+  //     showCheckStatus: false,
+  //   });
+  // };
 
   // 7个问题，7种颜色
   handleProblemChange = e => {
     console.log(e);
     const that = this;
-    // 请求问题玻璃的所有id
-    const urlencoded = new URLSearchParams();
-    urlencoded.append('pic_id', this.props.id);
-    request
-      .post('/api/v1/get/picture/url', {
-        data: urlencoded,
-      })
-      .then(function(response) {
-        if (response.result == 'success') {
-        } else {
-        }
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
+    let glassID = 0;
+    // 请求问题玻璃的所有id 
+    // const formData = new FormData();
+    // request
+    //   .post('/api/v1/get/log', {
+    //     data: formData,
+    //   })
+    //   .then(function(response) {
+    //     if(response[0]) {
+    //       let ids = [];
+    //       ids.push(response[0].pic_id)
+    //       // that.setState({
+    //       //   ids,
+    //       // })
+    //       that.setColor(that.props.jyds, ids, color[e-1])
+    //     }
+    //   })
+    //   .catch(function(error) {
+    //     console.log(error);
+    //   });
+     // 玻璃ID换取数据库glass的ID
+     const formData = new FormData();
+     formData.append('pic_id', this.props.id);
+     request
+       .post('/api/v1/get/glass', {
+         data: formData,
+       })
+       .then(function(response) {
+         glassID = response.id;
+       })
+       .catch(function(error) {
+         console.log(error);
+       });
+       // 数据库glass的ID换取log(历史记录)的ID
+       request
+       .post('/api/v1/get/log', {
+         data: glassID,
+       })
+       .then(function(response) {
+         if( e == response.state) {
+
+         }
+       })
+       .catch(function(error) {
+         console.log(error);
+       });
   };
 
-  // // 设置颜色,其中target：jyds, glass: 问题玻璃集合, color： 颜色集合
-  // setColor = (target, glass, color) => {
-  //   target.style = new Cesium.Cesium3DTileStyle({
-  //     // show: true,
-  //     color: {
-  //       evaluateColor: function(feature, result) {
-  //         const featureId = feature.getProperty('id');
-  //         if (featureId.includes(glass)) {
-  //           return Cesium.Color.clone(Cesium.Color.color, result);
-  //         } else {
-  //           return Cesium.Color.clone(Cesium.Color.WHITE, result);
-  //         }
-  //       },
-  //     },
-  //   });
-  // };
-
-  flyTo = (lon, lat, hight) => {
-    // 跳转
-    this.props.viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(lon, lat, hight), // 设置位置
-      orientation: {
-        heading: Cesium.Math.toRadians(-20), // 方向
-        pitch: Cesium.Math.toRadians(-20), // 倾斜角度
-        roll: 0,
-      },
-      duration: 5, // 设置飞行持续时间，默认会根据距离来计算
-      complete: function() {
-        // 到达位置后执行的回调函数
-        console.log('到达目的地');
+  // 设置颜色,其中target：jyds, glass: 问题玻璃集合, color： 颜色集合
+  setColor = (target, glass, color) => {
+    target.style = new Cesium.Cesium3DTileStyle({
+      // show: true,
+      color: {
+        evaluateColor: function(feature, result) {
+          // const featureId = feature.getProperty('id');
+          // if (featureId.includes(glass)) {
+          //   return Cesium.Color.clone(Cesium.Color.color, result);
+          // } else {
+          //   return Cesium.Color.clone(Cesium.Color.WHITE, result);
+          // }
+          glass.map((item, index) => {
+            console.log(item)
+            return Cesium.Color.clone(Cesium.Color.color, result);
+          })
+        },
       },
     });
   };
 
-  handleWest = () => {
-    this.flyTo(121.499710, 31.241044, 80)
+  flyTo = (lon, lat, hight, heading) => {
+    // 相机跳转
+    this.props.viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(lon, lat, hight), // 设置位置
+      orientation: {
+        heading: Cesium.Math.toRadians(heading), // 方向
+        pitch: Cesium.Math.toRadians(0), // 倾斜角度
+        roll: 0,
+      },
+      duration: 5, // 设置飞行持续时间，默认会根据距离来计算
+      complete: function(e) {
+        // 到达位置后执行的回调函数 
+        console.log(e);
+      },
+    });
   };
 
-  handleEath = () => {
-    this.flyTo(121.499436, 31.241592, 80)
+  handleEast = () => {
+    this.flyTo(121.501162, 31.240250, 150, -50)
   };
+
+  handleWest = () => {
+    this.flyTo(121.498322, 31.241935, 150, 130)
+  };    
 
   handleSouth = () => {
-    this.flyTo(121.499796, 31.241291, 80)
+    this.flyTo(121.498733, 31.240147, 150, 40)
   };
 
   handleNorth = () => {
-    this.flyTo(121.499337, 31.241021, 80)
+    this.flyTo(121.500511, 31.242533, 150, -140)
   };
 
- 
   render() {
     return (
       <div className="infobox">
@@ -381,14 +435,14 @@ class Info extends Component {
               value={2}
               onClick={() => {
                 this.props.handleHideBuildings();
-                this.handleHidePin();
+                // this.handleHidePin();
               }}
             >
               隐藏楼群
             </Radio>
-            <Radio value={3} style={{ color: 'white' }} onClick={this.handleCheck}>
+            {/* <Radio value={3} style={{ color: 'white' }} onClick={this.handleCheck}>
               检测状态
-            </Radio>
+            </Radio> */}
           </Radio.Group>
           {this.state.showCheckStatus ? (
             <>
@@ -410,6 +464,13 @@ class Info extends Component {
           )}
         </div>
         {/* 新增功能, date: 2020-07-04, 立面信息 */}
+        <div className="infoline" >
+          <label>各方位的玻璃总块数</label>
+          <span>东面：{eArrs.length}</span>
+          <span>西面：{wArrs.length}</span>
+          <span>南面：{sArrs.length}</span>
+          <span>北面：{nArrs.length}</span>
+        </div>
         <div className="infoline" style={{ marginTop: 15 }}>
           <label>方位</label>
           <Button ghost style={{ marginRight: 15, marginLeft: 20 }} onClick={this.handleEast}>
@@ -510,10 +571,10 @@ class Info extends Component {
 
         {/* 新增功能, date: 2020-07-04 */}
         <div className="infoline" style={{ marginTop: 15 }}>
-          <label>幕墙问题</label>
+          <label style={{width: 75, marginRight: 10}}>幕墙问题</label>
           <Select
             placeholder={'问题分类'}
-            style={{ width: 200, marginTop: 10 }}
+            style={{ width: 265, marginTop: 10 }}
             onChange={this.handleProblemChange}
           >
             <Option value="1">幕墙面板问题</Option>

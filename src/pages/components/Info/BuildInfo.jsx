@@ -8,7 +8,7 @@ class BuildInfo extends Component {
 
   render() {
     return (
-      <div className="infobox" style={{top: 320}}>
+      <div className="infobox" style={{top: 400}}>
         <div
           style={{ position: 'absolute', right: 15, top: 10, cursor: 'pointer' }}
           onClick={this.props.handleHideBuildInfo}
@@ -32,28 +32,28 @@ class BuildInfo extends Component {
         <div className='buildinfo'>
           <span>幕墙使用高度</span>
           <div>
-            <span>主楼:约258米</span>
+            <span>主楼:约258米</span><br />
             <span>裙楼:约24米</span>
           </div>
         </div>
         <div className='buildinfo'>
           <span>幕墙使用层数</span>
           <div>
-            <span>主楼:54层(实际层)</span>
+            <span>主楼:54层(实际层)</span><br />
             <span>裙楼:6层(实际层)</span>
           </div>
         </div>
         <div className='buildinfo'>
           <span>幕墙类型</span>
           <div>
-            <span>主楼:玻璃金属板组合型,玻璃石材组合型</span>
+            <span>主楼:玻璃金属板组合型,玻璃石材组合型</span><br />
             <span>裙楼:玻璃石材组合型,玻璃面板型</span>
           </div>
         </div>
         <div className='buildinfo'>
           <span>玻璃类型</span>
           <div>
-            <span>主楼:安全玻璃</span>
+            <span>主楼:安全玻璃</span><br />
             <span>裙楼:安全玻璃</span>
           </div>
         </div>
