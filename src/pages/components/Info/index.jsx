@@ -6,7 +6,7 @@
 import React, { Component } from 'react';
 import request from 'umi-request';
 import * as Cesium from 'cesium';
-import { Select, Input, Radio, Button } from 'antd';
+import { Select, Input, Radio, Button, message } from 'antd';
 import '../Card/index.css';
 
 const { Option } = Select;
@@ -21,9 +21,10 @@ let eArrs = [];
 let nArrs = [];
 let sArrs = [];
 let wArrs = [];
+let ids = [];
 const pinBuilder = new Cesium.PinBuilder();
 const selectedEntity = new Cesium.Entity();
-const color = ['red', 'Orange', 'yello', 'green', 'black', 'blue', 'purple']
+const color = ['red', 'orange', 'yellow', 'green', 'black', 'blue', 'purple'];
 
 class Info extends Component {
   constructor(props) {
@@ -41,13 +42,14 @@ class Info extends Component {
       Cgrass: [],
       GFgrass: [],
       value: '',
-      showCheckStatus: false,
+      showProblemStatus: false,
       detected1: '',
       detected2: '',
       detected3: '',
       notdetected5: '',
       notdetected6: '',
       notdetected7: '',
+      buttonISClick: false,
     };
   }
 
@@ -62,15 +64,15 @@ class Info extends Component {
       arrs.map((item, index) => {
         className = item.split('(')[1].split(')')[0];
         floorNum = item.slice(12, 17);
-        Nnum = item.slice(4, 6)
-        if(Nnum >= 70 && Nnum <= 107) {
-          eArrs.push(item)
-        }else if(Nnum >= 1  && Nnum <= 15) {
-          nArrs.push(item)
-        }else if(Nnum >= 54  && Nnum <= 69) {
-          sArrs.push(item)
-        }else {
-          wArrs.push(item)
+        Nnum = item.slice(4, 6);
+        if (Nnum >= 70 && Nnum <= 107) {
+          eArrs.push(item);
+        } else if (Nnum >= 1 && Nnum <= 15) {
+          nArrs.push(item);
+        } else if (Nnum >= 54 && Nnum <= 69) {
+          sArrs.push(item);
+        } else {
+          wArrs.push(item);
         }
         // floorNum = item.split(')'[1]);
         styleArr.push(className);
@@ -109,7 +111,6 @@ class Info extends Component {
           const featureId = feature.getProperty('id');
           if (featureId.includes(styleName)) {
             Cgrass.push(featureId);
-            console.log(Cgrass);
             Cgrass = Array.from(new Set(Cgrass));
             that.setState({
               Cgrass,
@@ -301,76 +302,52 @@ class Info extends Component {
 
   // 7个问题，7种颜色
   handleProblemChange = e => {
-    console.log(e);
     const that = this;
-    let glassID = 0;
-    // 请求问题玻璃的所有id 
-    // const formData = new FormData();
-    // request
-    //   .post('/api/v1/get/log', {
-    //     data: formData,
-    //   })
-    //   .then(function(response) {
-    //     if(response[0]) {
-    //       let ids = [];
-    //       ids.push(response[0].pic_id)
-    //       // that.setState({
-    //       //   ids,
-    //       // })
-    //       that.setColor(that.props.jyds, ids, color[e-1])
-    //     }
-    //   })
-    //   .catch(function(error) {
-    //     console.log(error);
-    //   });
-     // 玻璃ID换取数据库glass的ID
-     const formData = new FormData();
-     formData.append('pic_id', this.props.id);
-     request
-       .post('/api/v1/get/glass', {
-         data: formData,
-       })
-       .then(function(response) {
-         glassID = response.id;
-       })
-       .catch(function(error) {
-         console.log(error);
-       });
-       // 数据库glass的ID换取log(历史记录)的ID
-       request
-       .post('/api/v1/get/log', {
-         data: glassID,
-       })
-       .then(function(response) {
-         if( e == response.state) {
-
-         }
-       })
-       .catch(function(error) {
-         console.log(error);
-       });
+    ids = [];
+    that.setState({
+      showProblemStatus: true,
+    });
+    // 请求问题玻璃的所有id
+    const formData = new FormData();
+    formData.append('state', Math.pow(2, e));
+    request
+      .post('api/v1/get/matter/glass', {
+        data: formData,
+      })
+      .then(function(response) {
+        if (response) {
+          response.map((item, index) => {
+            ids.push(item.raw_id);
+          });
+          // that.setState({
+          //   ids,
+          // })
+        } else {
+          message.info('查询失败，请重试！');
+        }
+        that.setColor(that.props.jyds, ids, color[e]);
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
   };
 
   // 设置颜色,其中target：jyds, glass: 问题玻璃集合, color： 颜色集合
   setColor = (target, glass, color) => {
-    target.style = new Cesium.Cesium3DTileStyle({
-      // show: true,
-      color: {
-        evaluateColor: function(feature, result) {
-          // const featureId = feature.getProperty('id');
-          // if (featureId.includes(glass)) {
-          //   return Cesium.Color.clone(Cesium.Color.color, result);
-          // } else {
-          //   return Cesium.Color.clone(Cesium.Color.WHITE, result);
-          // }
-          glass.map((item, index) => {
-            console.log(item)
-            return Cesium.Color.clone(Cesium.Color.color, result);
-          })
-        },
-      },
-    });
-  };
+    console.log(color)
+    glass.map((item, index) => {
+      // console.log(item)
+      target.style = new Cesium.Cesium3DTileStyle({
+      //   // show: true,
+        color: {
+          // evaluateColor: function(item, result) {
+          //       return Cesium.Color.clone(Cesium.Color.color, result);
+          //     }
+          conditions: [[item, Cesium.Color.color]],
+          },
+      })
+    })
+  }
 
   flyTo = (lon, lat, hight, heading) => {
     // 相机跳转
@@ -381,28 +358,24 @@ class Info extends Component {
         pitch: Cesium.Math.toRadians(0), // 倾斜角度
         roll: 0,
       },
-      duration: 5, // 设置飞行持续时间，默认会根据距离来计算
-      complete: function(e) {
-        // 到达位置后执行的回调函数 
-        console.log(e);
-      },
+      duration: 2, // 设置飞行持续时间，默认会根据距离来计算
     });
   };
 
   handleEast = () => {
-    this.flyTo(121.501162, 31.240250, 150, -50)
+    this.flyTo(121.500511, 31.242533, 100.0, -140);
+  };
+
+  handleSouth = () => {
+    this.flyTo(121.501162, 31.24025, 100.0, -50);
   };
 
   handleWest = () => {
-    this.flyTo(121.498322, 31.241935, 150, 130)
-  };    
-
-  handleSouth = () => {
-    this.flyTo(121.498733, 31.240147, 150, 40)
+    this.flyTo(121.498733, 31.240147, 100.0, 40);
   };
 
   handleNorth = () => {
-    this.flyTo(121.500511, 31.242533, 150, -140)
+    this.flyTo(121.498322, 31.241935, 100.0, 130);
   };
 
   render() {
@@ -444,43 +417,26 @@ class Info extends Component {
               检测状态
             </Radio> */}
           </Radio.Group>
-          {this.state.showCheckStatus ? (
-            <>
-              <div className="colorline" style={{ justifyContent: 'flex-start' }}>
-                <div style={{ display: 'flex', alignItems: 'center', float: 'left' }}>
-                  <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
-                  <span style={{ fontSize: 12, marginLeft: 10 }}>未检测</span>
-                </div>
-              </div>
-              <div className="colorline" style={{ justifyContent: 'flex-start' }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <span className="colorbox" style={{ backgroundColor: 'green' }}></span>
-                  <span style={{ fontSize: 12, marginLeft: 10 }}>已检测</span>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div></div>
-          )}
         </div>
         {/* 新增功能, date: 2020-07-04, 立面信息 */}
-        <div className="infoline" >
+        <div className="infoline" style={{ width: 500 }}>
           <label>各方位的玻璃总块数</label>
-          <span>东面：{eArrs.length}</span>
-          <span>西面：{wArrs.length}</span>
-          <span>南面：{sArrs.length}</span>
-          <span>北面：{nArrs.length}</span>
+          <span style={{ width: 80, marginRight: 5 }}>东面：{eArrs.length}</span>
+          <span style={{ width: 80, marginRight: 5 }}>西面：{wArrs.length}</span>
+          <br />
+          <span style={{ width: 80, marginRight: 5 }}>南面：{sArrs.length}</span>
+          <span style={{ width: 80 }}>北面：{nArrs.length}</span>
         </div>
         <div className="infoline" style={{ marginTop: 15 }}>
           <label>方位</label>
           <Button ghost style={{ marginRight: 15, marginLeft: 20 }} onClick={this.handleEast}>
             东
           </Button>
-          <Button ghost style={{ marginRight: 15 }} onClick={this.handleWest}>
-            西
-          </Button>
           <Button ghost style={{ marginRight: 15 }} onClick={this.handleSouth}>
             南
+          </Button>
+          <Button ghost style={{ marginRight: 15 }} onClick={this.handleWest}>
+            西
           </Button>
           <Button ghost onClick={this.handleNorth}>
             北
@@ -488,7 +444,7 @@ class Info extends Component {
         </div>
 
         <div style={{ marginTop: 15 }}>
-          <label style={{ float: 'left', marginRight: 10 }}>幕墙位置</label>
+          <label style={{ float: 'left', marginRight: 5 }}>幕墙位置</label>
           <Select
             placeholder={'请选择分类'}
             style={{ width: 100, marginRight: 20, float: 'left', background: 'transparent ' }}
@@ -570,22 +526,87 @@ class Info extends Component {
         </div>
 
         {/* 新增功能, date: 2020-07-04 */}
-        <div className="infoline" style={{ marginTop: 15 }}>
-          <label style={{width: 75, marginRight: 10}}>幕墙问题</label>
+        <div className="infoline" style={{ marginTop: 15, width: 400 }}>
+          <label style={{ width: 90, marginRight: 10 }}>幕墙问题</label>
           <Select
             placeholder={'问题分类'}
-            style={{ width: 265, marginTop: 10 }}
+            style={{ width: 300, marginTop: 10 }}
             onChange={this.handleProblemChange}
           >
-            <Option value="1">幕墙面板问题</Option>
-            <Option value="2">外露构件问题</Option>
-            <Option value="3">承力构件、连接件、连接螺栓问题</Option>
-            <Option value="4">硅酮密封胶、胶条问题</Option>
-            <Option value="5">开启部分问题</Option>
-            <Option value="6">幕墙排水系统问题</Option>
-            <Option value="7">硅酮结构密封胶、粘接性能问题</Option>
+            <Option value="0">幕墙面板问题</Option>
+            <Option value="1">外露构件问题</Option>
+            <Option value="2">承力构件、连接件、连接螺栓问题</Option>
+            <Option value="3">硅酮密封胶、胶条问题</Option>
+            <Option value="4">开启部分问题</Option>
+            <Option value="5">幕墙排水系统问题</Option>
+            <Option value="6">硅酮结构密封胶、粘接性能问题</Option>
           </Select>
         </div>
+        {this.state.showProblemStatus ? (
+          <>
+            <div
+              className="colorline"
+              style={{
+                justifyContent: 'flex-start',
+                float: 'left',
+                marginTop: 10,
+                marginRight: 135,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', float: 'left' }}>
+                <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>幕墙面板问题</span>
+              </div>
+            </div>
+            <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="colorbox" style={{ backgroundColor: 'orange' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>外露构件问题</span>
+              </div>
+            </div>
+            <br />
+            <div
+              className="colorline"
+              style={{ justifyContent: 'flex-start', float: 'left', marginRight: 28 }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="colorbox" style={{ backgroundColor: 'yellow' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>承力构件、连接件、连接螺栓问题</span>
+              </div>
+            </div>
+            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="colorbox" style={{ backgroundColor: 'green' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮密封胶、胶条问题</span>
+              </div>
+            </div>
+            <br />
+            <div
+              className="colorline"
+              style={{ justifyContent: 'flex-start', float: 'left', marginRight: 135 }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="colorbox" style={{ backgroundColor: 'black' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>开启部分问题</span>
+              </div>
+            </div>
+            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="colorbox" style={{ backgroundColor: 'blue' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>幕墙排水系统问题</span>
+              </div>
+            </div>
+            <br />
+            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="colorbox" style={{ backgroundColor: 'purple' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮结构密封胶、粘接性能问题</span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div></div>
+        )}
       </div>
     );
   }

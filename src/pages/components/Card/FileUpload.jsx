@@ -10,7 +10,7 @@ import request from 'umi-request';
 
 class FileUpload extends Component {
   constructor(props) {
-    super(props); 
+    super(props);
     this.state = {
       files: [],
       previewVisible: false,
@@ -40,13 +40,13 @@ class FileUpload extends Component {
   // 文件提交
   handleSubmit = e => {
     console.log(this.state.files[0].name);
-    const formData = new FormData();
-    formData.append('log_id', this.props.logID);
-    formData.append('title', 'pictest');
-    formData.append('my_file', this.state.files[0].name);
+    console.log(this.props.glassID);
+    const formData1 = new FormData();
+    formData1.append('glass_id', this.props.glassID);
+    formData1.append('state', 0);
     request('/api/v1/add/picture', {
       method: 'post',
-      data: formData,
+      data: formData1,
     })
       .then(function(response) {
         console.log(response);
@@ -59,6 +59,30 @@ class FileUpload extends Component {
       .catch(function(error) {
         console.log(error);
       });
+
+    const formData2 = new FormData();
+    formData2.append('log_id', this.props.logID);
+    formData2.append('title', 'pictest');
+    formData2.append('my_file', this.state.files[0].name);
+    if (this.props.logID) {
+      request('/api/v1/add/picture', {
+        method: 'post',
+        data: formData2,
+      })
+        .then(function(response) {
+          console.log(response);
+          if (response.result == 'failed') {
+            message.info('上传失败！');
+          } else {
+            message.info('上传成功！');
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    } else {
+      message.info('该玻璃未录入数据库！请重试！');
+    }
   };
 
   render() {

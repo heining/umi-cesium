@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import { message } from 'antd';
 import request from 'umi-request';
-import FileUpload from './FileUpload';
+// import FileUpload from './FileUpload';
 import Zmage from 'react-zmage';
 import QRCode from 'qrcode.react';
 import './index.css';
@@ -16,53 +17,74 @@ class Card extends Component {
     super(props);
     this.state = {
       ...props,
-      logID: 0,
+      glassID: 0,
       showDetail: true,
-      showImg: false,
       showUpload: true,
       files: [],
     };
-    console.log(this.props.id)
+    console.log(this.props.id);
   }
 
   componentDidMount() {
     let glassID = 0;
-    let logID = 0;
+    let currentlogID = 0;
     const that = this;
     // 玻璃ID换取数据库glass的ID
-    const formData = new FormData();
-    formData.append('pic_id', this.props.id);
+    const formData1 = new FormData();
+    formData1.append('raw_glass_id', this.props.id);
     request
-      .post('http://113.31.105.181:8180/api/v1/get/glass', {
-        data: formData,
+      .post('/api/v1/get/glass', {
+        data: formData1,
       })
       .then(function(response) {
-        glassID = response.id;
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
-      // 数据库glass的ID换取log(历史记录)的ID
-      request
-      .post('/api/v1/get/log', {
-        data: glassID,
-      })
-      .then(function(response) {
-        logID = response.id
-        this.setState({
-          logID
-        })
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
-      // 通过log(历史记录)的ID查询图片
-      request
-      .post('/media/api/v1/get/picture', {
-        data: logID,
-      })
-      .then(function(response) {
-        url = response.my_file
+        if (response.result != 'failed') {
+          glassID = response.id;
+          that.props.back(glassID)
+          // 数据库glass的ID换取log(历史记录)的ID
+          const formData2 = new FormData();
+          formData2.append('glass_id', glassID);
+          request
+            .post('/api/v1/get/log', {
+              data: formData2,
+            })
+            .then(function(response) {
+              if (response.length > 0) {
+                console.log(response.length);
+                currentlogID = response[response.length - 1].id;
+                console.log(currentlogID);
+                // 通过log(历史记录)的ID查询图片
+                const formData3 = new FormData();
+                formData3.append('log_id', currentlogID);
+                request
+                  .post('/api/v1/get/picture', {
+                    data: formData3,
+                  })
+                  .then(function(response) {
+                    if (response.result != 'failed') {
+                      console.log(response[0])
+                      url = response[0].my_file;
+                      that.setState({
+                        url
+                      })
+                      console.log(url)
+                    } else {
+                      message.info('该图片不存在，请重试！');
+                    }
+                  })
+                  .catch(function(error) {
+                    console.log(error);
+                  });
+              }
+            })
+            .catch(function(error) {
+              console.log(error);
+            });
+          that.setState({
+            glassID,
+          });
+        } else {
+          message.info('该玻璃未录入数据库');
+        }
       })
       .catch(function(error) {
         console.log(error);
@@ -91,7 +113,7 @@ class Card extends Component {
           </span>
         );
       }
-    } 
+    }
     // if(id.slice(1, 2) == 'L1') {
     //   if(id.split('(')[1].split(')')[0] == 'C001') {
     //     return (
@@ -154,11 +176,8 @@ class Card extends Component {
         >
           X
         </div>
-        <div
-          className="infoline"
-          style={{fontSize: 16, marginBottom: 15}}
-        >
-          <span >编号：</span>  
+        <div className="infoline" style={{ fontSize: 16, marginBottom: 15 }}>
+          <span>编号：</span>
           <span>{this.props.id}</span>
         </div>
         <div className="infoline">
@@ -181,24 +200,20 @@ class Card extends Component {
         </div>
         <div className="infoline">
           <span>当前图片：</span>
-          {this.state.showImg ? (
-            <Zmage src={require(url)} style={{ width: '70%', height: '70%' }} />
-          ) : (
-            <Zmage src={require('@/assets/good.jpg')} style={{ width: '70%', height: '70%' }} />
-          )}
+          { url ? <Zmage src={'http://113.31.105.181:8180/media/' + url} style={{ width: '70%', height: '70%' }} /> : <div></div>} 
         </div>
         <div className="infoline">
           <a onClick={this.props.showhistory}>历史图片</a>
         </div>
-        <div className="infoline">
-          <FileUpload id={this.props.id} logID={this.state.logID}/>
-        </div>
+        {/* <div className="infoline">
+          <FileUpload id={this.props.id} glassID={this.state.glassID} />
+        </div> */}
         <div className="infoline">
           <span>详细信息：</span>
           <div style={{ display: 'flex', justifyContent: 'left', width: 180, margin: 10 }}>
             {/* 二维码 */}
             <QRCode
-              value={`http://lesuidao.cn/smart_city_mobile/#/windowdetail?code=${this.props.id}&status=ok`}// 生成二维码的内容
+              value={`http://lesuidao.cn/smart_city_mobile/#/windowdetail?code=${this.props.id}&status=ok`} // 生成二维码的内容
               size={88} // 二维码的大小
               fgColor="#000000" // 二维码的颜色
             />

@@ -8,7 +8,7 @@ class BuildInfo extends Component {
 
   render() {
     return (
-      <div className="infobox" style={{top: 400}}>
+      <div className="infobox" style={{top: 600 }}>
         <div
           style={{ position: 'absolute', right: 15, top: 10, cursor: 'pointer' }}
           onClick={this.props.handleHideBuildInfo}

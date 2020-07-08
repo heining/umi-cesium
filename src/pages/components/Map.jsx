@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as Cesium from 'cesium';
 import Info from './Info/index';
 import BuildInfo from './Info/BuildInfo';
-import DetailInfo from './Info/DetailInfo';
+// import DetailInfo from './Info/DetailInfo';
 import Card from './Card/index';
 import History from './Card/History';
 import 'cesium/Source/Widgets/widgets.css';
@@ -81,7 +81,7 @@ class Map extends Component {
     } else {
       // 重新选择
       const pick = this.scene.pick(movement.position);
-      console.log(pick);
+      // console.log(pick);
       // 判断pick是否为空
       if (Cesium.defined(pick)) {
         // 根据每块玻璃的ID区分
@@ -168,11 +168,11 @@ class Map extends Component {
     });
   };
 
-  handleShowDetailInfo = () => {
-    this.setState({
-      showDetailInfo: true,
-    });
-  };
+  // handleShowDetailInfo = () => {
+  //   this.setState({
+  //     showDetailInfo: true,
+  //   });
+  // };
 
   // handleHideDetailInfo = () => {
   //   this.setState({
@@ -205,6 +205,7 @@ class Map extends Component {
       vrButton: false,
       infoBox: false,
     });
+    // 设置模型灰度
     let layer0 = viewer.scene.imageryLayers.get(0);
     layer0.gamma = 0.88;
     // 隐藏页面控件
@@ -316,6 +317,7 @@ class Map extends Component {
             style={{ position: 'absolute' }}
             id={this.state.id}
             closeInfo={this.closeInfo}
+            back={(v)=>{this.setState({glassID: v})}}
             showHistory={this.state.showHistory}
             showhistory={this.showhistory}
           />
@@ -323,7 +325,7 @@ class Map extends Component {
           <div></div>
         )}
         {/* 历史图片 */}
-        {this.state.showHistory ? <History closehistory={this.closehistory} /> : <div></div>}
+        {this.state.showHistory ? <History closehistory={this.closehistory} glassID={this.state.glassID}/> : <div></div>}
 
         {/* 建筑幕墙信息 */}
         {this.state.showBuildInfo ? (
@@ -336,11 +338,11 @@ class Map extends Component {
         )}
 
         {/* 幕墙详细信息 */}
-        {this.state.showDetailInfo ? (
+        {/* {this.state.showDetailInfo ? (
           <DetailInfo handleHideDetailInfo={this.handleHideDetailInfo} />
         ) : (
           <div></div>
-        )}
+        )} */}
       </div>
     );
   }
