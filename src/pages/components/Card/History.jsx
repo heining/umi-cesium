@@ -23,6 +23,7 @@ class History extends Component {
   }
 
   componentDidMount() {
+    console.log(urls, this.state.urls);
     const that = this;
     // 数据库glass的ID换取log(历史记录)的ID
     const formData2 = new FormData();
@@ -34,58 +35,63 @@ class History extends Component {
       .then(function(response) {
         if (response.length > 0) {
           response.map((item, index) => {
-            logID.push(item.id);
+            console.log(item);
+            const formData3 = new FormData();
+            formData3.append('log_id', item.id);
+            request
+              .post('/api/v1/get/picture', {
+                data: formData3,
+              })
+              .then(function(response) {
+                if (response.result != 'failed') {
+                  let url = response[0].my_file;
+                  urls.push(url);
+                  that.setState({
+                    urls,
+                  });
+                } else {
+                  message.info('该图片不存在，请重试！');
+                }
+              })
+              .catch(function(error) {
+                console.log(error);
+              });
             times.push(item.update_time);
             that.setState({ times });
           });
         }
-        logID.map((item, index) => {
-          // 通过log(历史记录)的ID查询图片
-          const formData3 = new FormData();
-          formData3.append('log_id', item);
-          request
-            .post('/api/v1/get/picture', {
-              data: formData3,
-            })
-            .then(function(response) {
-              if (response.result != 'failed') {
-                let url = response[0].my_file;
-                urls.push(url);
-                that.setState({
-                  urls,
-                });
-              } else {
-                message.info('该图片不存在，请重试！');
-              }
-            })
-            .catch(function(error) {
-              console.log(error);
-            });
-        });
       })
       .catch(function(error) {
         console.log(error);
       });
   }
+  componentWillUnmount = () => {
+    console.log('1');
+    urls = [];
+    time = '';
+    logID = [];
+    times = [];
+    this.setState({ urls: [], times: '' });
+  };
 
   imgRender = () => {
     return (
       // <Scrollbar>
-        <Timeline>
-          {this.state.urls.map((item, index) => (
-            <Item key={index}>
-              <span style={{ color: 'white' }}>{this.state.times[index]}</span>
-              {urls ? (
-                <Zmage
-                  src={'http://113.31.105.181:8180/media/' + item}
-                  style={{ width: '30%', height: '30%' }}
-                />
-              ) : (
-                <div></div>
-              )}
-            </Item>
-          ))}
-        </Timeline>
+      <Timeline>
+        {this.state.urls.map((item, index) => (
+          <Item key={index}>
+            <span style={{ color: 'white' }}>{this.state.times[index]}</span>
+            {urls ? (
+              <Zmage
+                src={'http://113.31.105.181:8180/media/' + item}
+                style={{ width: '30%', height: '30%' }}
+              />
+            ) : (
+              <div></div>
+            )}
+          </Item>
+        ))}
+      </Timeline>
       // </Scrollbar>
     );
   };

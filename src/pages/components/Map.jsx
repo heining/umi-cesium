@@ -3,6 +3,7 @@ import * as Cesium from 'cesium';
 import Info from './Info/index';
 import BuildInfo from './Info/BuildInfo';
 // import DetailInfo from './Info/DetailInfo';
+import { Input, Button, message } from 'antd';
 import Card from './Card/index';
 import History from './Card/History';
 import 'cesium/Source/Widgets/widgets.css';
@@ -22,6 +23,9 @@ class Map extends Component {
       showBuildings: true,
       showBuildInfo: false,
       showDetailInfo: false,
+      IsLogin: false,
+      nameValue: '',
+      passValue: ''
     };
   }
 
@@ -109,9 +113,11 @@ class Map extends Component {
             Cesium.Color.clone(pick.color, selected.originalColor);
           }
           this.setState({
-            WFid: name,
+            showDetail: true,
+            id: name,
+            showHistory: false,
           });
-          console.log(this.state.WFid);
+          // console.log(this.state.WFid);
         }
       }
     }
@@ -168,6 +174,29 @@ class Map extends Component {
     });
   };
 
+  handleName = (e) => {
+    console.log(e.target.value)
+    this.setState({
+      nameValue: e.target.value
+    })
+    if(this.state.nameValue !== 'inskylab') {
+      message.info('用户名错误，请重新输入')
+    }
+  };
+  handlePass = (e) => {
+    console.log(e.target.value)
+    this.setState({
+      PassValue: e.target.value
+    })
+    if(this.state.nameValue !== '123456') {
+      message.info('密码错误，请重新输入')
+    }
+  };
+
+  handleClick = () => {
+    message.info('登录成功')
+  }
+
   // handleShowDetailInfo = () => {
   //   this.setState({
   //     showDetailInfo: true,
@@ -218,7 +247,7 @@ class Map extends Component {
     viewer.scene.postProcessStages.fxaa.enabled = true;
     // 添加贴图
     const jyds = new Cesium.Cesium3DTileset({
-      url: 'http://cdn.lesuidao.cn/8/tileset.json',
+      url: 'http://cdn.lesuidao.cn/jydsformat/tileset.json',
       maximumScreenSpaceError: 16, //细化程度的最大屏幕空间错误（提高清晰度）
       maximumMemoryUsage: 1024,
     });
@@ -283,67 +312,136 @@ class Map extends Component {
   }
 
   render() {
+    // const layout = {
+    //   labelCol: {
+    //     span: 8,
+    //   },
+    //   wrapperCol: {
+    //     span: 16,
+    //   },
+    // };
     return (
-      <div id="cesiumContainer" style={{ width: '100vw', height: '100vh' }}>
-        <div
-          style={{
-            position: 'absolute',
-            color: 'white',
-            textAlign: 'center',
-            top: 20,
-            fontSize: 18,
-            fontWeight: 400,
-            zIndex: 1,
-            width: '100%',
-          }}
-        >
-          内部信息，请勿外传！
-        </div>
-        <Info
-          style={{ position: 'absolute' }}
-          viewer={this.viewer}
-          jyds={this.jyds}
-          model11={this.model11}
-          scene={this.scene}
-          arrs={this.state.arrs}
-          showModel11={this.state.showModel11}
-          handleHideBuildings={this.handleHideBuildings}
-          handleShowBuildings={this.handleShowBuildings}
-          handleShowBuildInfo={this.handleShowBuildInfo}
-        />
-        {/* 详细信息 */}
-        {this.state.showDetail ? (
-          <Card
+      // <div>
+      //   <div
+      //     style={{
+      //       position: 'absolute',
+      //       width: '100vw',
+      //       height: '100vh',
+      //       zIndex: 2,
+      //       backgroundColor: 'white',
+      //     }}
+      //   >
+          /* <Form {...layout} style={{paddingTop: '20%'}}>
+            <Form.Item
+              label="用户名"
+              name="username"
+              rules={[
+                {
+                  required: true,
+                  max: 12,
+                  min: 6,
+                  pattern: [/a-zA-Z/g],
+                  message: 'Please input your username!',
+                }
+              ]}
+              style={{ width: 400 }}
+            >
+              <Input onChange={this.handleName}/>
+            </Form.Item>
+            <Form.Item
+              label="密码"
+              name="password"
+              rules={[
+                {
+                  required: true,
+                  max: 12,
+                  min: 6,
+                  pattern: [/a-zA-Z0-9/g],
+                  message: 'Please input your password!',
+                }
+              ]}
+              style={{ width: 400 }}
+            >
+              <Input.Password />
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" onClick={this.handleClick}>
+                登录
+              </Button>
+            </Form.Item>
+          </Form> */
+        //   <Input placeholder='用户名' style={{width: 300, marginBottom: 20}} maxLength={8} value={this.state.nameValue} onChange={this.handleName}/><br />
+        //   <Input placeholder ='密码' style={{width: 300, marginBottom: 20}} maxLength={12} value={this.state.passValue} onChange={this.handlePass}/><br />
+        //   <Button onClick={this.handleClick}>登录</Button>
+        // </div>
+        <div id="cesiumContainer" style={{ width: '100vw', height: '100vh' }}>
+          {/* <div
+            style={{
+              position: 'absolute',
+              color: 'white',
+              textAlign: 'center',
+              top: 20,
+              fontSize: 18,
+              fontWeight: 400,
+              zIndex: 1,
+              width: '100%',
+            }}
+          >
+            内部信息，请勿外传！
+          </div> */}
+          {/* 交银大厦显示层 */}
+          <Info
             style={{ position: 'absolute' }}
-            id={this.state.id}
-            closeInfo={this.closeInfo}
-            back={(v)=>{this.setState({glassID: v})}}
-            showHistory={this.state.showHistory}
-            showhistory={this.showhistory}
+            viewer={this.viewer}
+            jyds={this.jyds}
+            model11={this.model11}
+            scene={this.scene}
+            arrs={this.state.arrs}
+            showModel11={this.state.showModel11}
+            handleHideBuildings={this.handleHideBuildings}
+            handleShowBuildings={this.handleShowBuildings}
+            handleShowBuildInfo={this.handleShowBuildInfo}
           />
-        ) : (
-          <div></div>
-        )}
-        {/* 历史图片 */}
-        {this.state.showHistory ? <History closehistory={this.closehistory} glassID={this.state.glassID}/> : <div></div>}
+          {/* 玻璃详细信息 */}
+          {this.state.showDetail ? (
+            <Card
+              style={{ position: 'absolute' }}
+              id={this.state.id}
+              closeInfo={this.closeInfo}
+              back={v => {
+                this.setState({ glassID: v });
+              }}
+              showHistory={this.state.showHistory}
+              showhistory={this.showhistory}
+            />
+          ) : (
+            <div></div>
+          )}
+          {/* 历史图片 */}
+          {this.state.showHistory ? (
+            <History closehistory={this.closehistory} glassID={this.state.glassID} />
+          ) : (
+            <div></div>
+          )}
 
-        {/* 建筑幕墙信息 */}
-        {this.state.showBuildInfo ? (
-          <BuildInfo
-            handleHideBuildInfo={this.handleHideBuildInfo}
-            handleShowDetailInfo={this.handleShowDetailInfo}
-          />
-        ) : (
-          <div></div>
-        )}
+          {/* 建筑幕墙信息 */}
+          {this.state.showBuildInfo ? (
+            <BuildInfo
+              handleHideBuildInfo={this.handleHideBuildInfo}
+              handleShowDetailInfo={this.handleShowDetailInfo}
+            />
+          ) : (
+            <div></div>
+          )}
 
-        {/* 幕墙详细信息 */}
-        {/* {this.state.showDetailInfo ? (
-          <DetailInfo handleHideDetailInfo={this.handleHideDetailInfo} />
-        ) : (
-          <div></div>
-        )} */}
-      </div>
+          {/* 幕墙详细信息 */}
+          {/* {this.state.showDetailInfo ? (
+            <DetailInfo handleHideDetailInfo={this.handleHideDetailInfo} />
+          ) : (
+            <div></div>
+          )} */}
+        </div>
+      // </div>
     );
   }
 }

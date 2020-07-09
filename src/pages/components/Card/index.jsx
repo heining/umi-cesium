@@ -21,17 +21,19 @@ class Card extends Component {
       showDetail: true,
       showUpload: true,
       files: [],
+      url: '',
     };
     console.log(this.props.id);
   }
 
-  componentDidMount() {
+  getPic = v => {
+    url = [];
     let glassID = 0;
     let currentlogID = 0;
     const that = this;
     // 玻璃ID换取数据库glass的ID
     const formData1 = new FormData();
-    formData1.append('raw_glass_id', this.props.id);
+    formData1.append('raw_glass_id', v || this.props.id);
     request
       .post('/api/v1/get/glass', {
         data: formData1,
@@ -39,7 +41,7 @@ class Card extends Component {
       .then(function(response) {
         if (response.result != 'failed') {
           glassID = response.id;
-          that.props.back(glassID)
+          that.props.back(glassID);
           // 数据库glass的ID换取log(历史记录)的ID
           const formData2 = new FormData();
           formData2.append('glass_id', glassID);
@@ -61,12 +63,12 @@ class Card extends Component {
                   })
                   .then(function(response) {
                     if (response.result != 'failed') {
-                      console.log(response[0])
+                      console.log(response[0]);
                       url = response[0].my_file;
                       that.setState({
-                        url
-                      })
-                      console.log(url)
+                        url,
+                      });
+                      console.log(url);
                     } else {
                       message.info('该图片不存在，请重试！');
                     }
@@ -81,6 +83,7 @@ class Card extends Component {
             });
           that.setState({
             glassID,
+            url,
           });
         } else {
           message.info('该玻璃未录入数据库');
@@ -89,6 +92,23 @@ class Card extends Component {
       .catch(function(error) {
         console.log(error);
       });
+  };
+
+  componentDidMount() {
+    console.log('step');
+    this.getPic();
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log(nextProps, this.props.id);
+    if (nextProps.id == this.props.id) {
+      console.log('no-up');
+      return true;
+    } else {
+      console.log('up');
+      this.getPic(nextProps.id);
+      return true;
+    }
   }
 
   sizeRender = () => {
@@ -200,7 +220,14 @@ class Card extends Component {
         </div>
         <div className="infoline">
           <span>当前图片：</span>
-          { url ? <Zmage src={'http://113.31.105.181:8180/media/' + url} style={{ width: '70%', height: '70%' }} /> : <div></div>} 
+          {this.state.url ? (
+            <Zmage
+              src={'http://113.31.105.181:8180/media/' + this.state.url}
+              style={{ width: '70%', height: '70%' }}
+            />
+          ) : (
+            <div></div>
+          )}
         </div>
         <div className="infoline">
           <a onClick={this.props.showhistory}>历史图片</a>

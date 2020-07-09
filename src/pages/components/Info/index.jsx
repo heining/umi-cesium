@@ -24,7 +24,7 @@ let wArrs = [];
 let ids = [];
 const pinBuilder = new Cesium.PinBuilder();
 const selectedEntity = new Cesium.Entity();
-const color = ['red', 'orange', 'yellow', 'green', 'black', 'blue', 'purple'];
+const Color = ['RED', 'ORANGE', 'YELLOW', 'RED', 'BLACK', 'BLUE', 'PURPLE'];
 
 class Info extends Component {
   constructor(props) {
@@ -50,6 +50,8 @@ class Info extends Component {
       notdetected6: '',
       notdetected7: '',
       buttonISClick: false,
+      PodiumArea: 0,
+      mainArea: 0
     };
   }
 
@@ -190,6 +192,7 @@ class Info extends Component {
   // 按下回车
   handleEnter = () => {
     const { id } = this.state;
+    console.log(id)
     // 跳转
     this.props.viewer.flyTo(this.props.jyds);
     // 选中效果
@@ -325,32 +328,88 @@ class Info extends Component {
         } else {
           message.info('查询失败，请重试！');
         }
-        that.setColor(that.props.jyds, ids, color[e]);
+        that.setColor(that.props.jyds, ids, Color[e]);
+        that.damagedArea(ids)
       })
       .catch(function(error) {
         console.log(error);
       });
   };
 
-  // 设置颜色,其中target：jyds, glass: 问题玻璃集合, color： 颜色集合
-  setColor = (target, glass, color) => {
-    console.log(color)
-    glass.map((item, index) => {
-      // console.log(item)
+  // 设置颜色,其中target：jyds, glass: 问题玻璃集合, Color 颜色集合
+  setColor = (target, glass, Color) => {
+    // console.log(glass)
       target.style = new Cesium.Cesium3DTileStyle({
-      //   // show: true,
+        // show: true,
         color: {
-          // evaluateColor: function(item, result) {
-          //       return Cesium.Color.clone(Cesium.Color.color, result);
-          //     }
-          conditions: [[item, Cesium.Color.color]],
+          evaluateColor: function(feature, result) {
+            const featureId = feature.getProperty('id');
+            // console.log(glass.includes(featureId))
+            if (glass.includes(featureId)) {
+              return Cesium.Color.clone(Cesium.Color[Color], result);
+            } else {
+              return Cesium.Color.clone(Cesium.Color.WHITE, result);
+            }
           },
-      })
+        },
+      });
+  };
+
+  // 密封胶破损面积
+  damagedArea = (array) => {
+    // 裙楼密封胶玻璃集合
+    let Podium = [];
+    let PodiumArea = 0;
+    // 主楼密封胶玻璃集合
+    let mainBuilding = [];
+    let mainArea = 0;
+    let pnum1 = 0;
+    let pnum2 = 0;
+    let mnum1 = 0;
+    let mnum2 = 0;
+    let mnum3 = 0;
+    let mnum4 = 0;
+    array.map((item, index) => {
+      if(Number.parseInt(item.split('F')[1]) < 6) {
+        Podium.push(item)
+      }else {
+        mainBuilding.push(item)
+      }
+    })
+    Podium.map((item, index) => {
+      if(item.split('(')[1].split(')')[0] == 'C01') {
+        pnum1 = pnum1 + 1;
+      }else if(item.split('(')[1].split(')')[0] == 'C02') {
+        pnum2 = pnum2 + 1;
+      }
+    })
+    PodiumArea = 3.3 * pnum1 + 1.6  * pnum2;
+    // console.log(PodiumArea.toFixed(3))
+    mainBuilding.map((item, index) => {
+      if(item.includes('GF')) {
+        if(item.split('(')[1].split(')')[0] == 'C01') {
+          mnum1 = mnum1 + 1;
+        }else if(item.split('(')[1].split(')')[0] == 'C03') {
+          mnum2 = mnum2 + 1;
+        }else if(item.split('(')[1].split(')')[0] == 'C05') {
+          mnum3 = mnum3 + 1;
+        }
+      }else if(item.includes('WF')) {
+        if(item.split('(')[1].split(')')[0] == 'C02') {
+          mnum4 = mnum4 + 1;
+        }
+      }
+    })
+    mainArea = 3.3 * mnum1 + 0.8 * mnum2 + 3.6 * mnum3 + 0.75 * mnum4;
+    // console.log(mainArea.toFixed(3))
+    this.setState({
+      PodiumArea: PodiumArea.toFixed(3),
+      mainArea: mainArea.toFixed(3)
     })
   }
 
+  // 立面信息
   flyTo = (lon, lat, hight, heading) => {
-    // 相机跳转
     this.props.viewer.camera.flyTo({
       destination: Cesium.Cartesian3.fromDegrees(lon, lat, hight), // 设置位置
       orientation: {
@@ -515,7 +574,7 @@ class Info extends Component {
             placeholder="请输入幕墙编号"
             allowClear
             onChange={this.handleChange}
-            onPressEnter={this.handleEnter}
+            onPressEnter={this.handleEnter}       
           />
           <div style={{ color: 'green', fontSize: 12, textAlign: 'left' }}>
             请按照当前格式输入：L2N072-(C74)GF013
@@ -576,8 +635,10 @@ class Info extends Component {
             </div>
             <div className="colorline" style={{ justifyContent: 'flex-start' }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span className="colorbox" style={{ backgroundColor: 'green' }}></span>
+                <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
                 <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮密封胶、胶条问题</span>
+                <span>主楼破损总面积：{this.state.PodiumArea}</span>
+                <span>裙楼破损总面积：{this.state.mainArea}</span>
               </div>
             </div>
             <br />
