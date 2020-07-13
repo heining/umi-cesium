@@ -10,6 +10,7 @@ import History from './Card/History';
 import 'cesium/Source/Widgets/widgets.css';
 
 const arrs = [];
+const WFarrs = [];
 const South = [];
 
 class Map extends Component {
@@ -19,6 +20,7 @@ class Map extends Component {
       id: '',
       WFid: '',
       arrs: [],
+      WFarrs: [],
       showDetail: false,
       showHistory: false,
       showBuildings: true,
@@ -238,7 +240,7 @@ class Map extends Component {
 
   jydsPosition = () => {
     this.viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(121.491061, 31.241369, 150), // 设置位置
+      destination: Cesium.Cartesian3.fromDegrees(121.492921, 31.241909, 150), // 设置位置
       orientation: {
         heading: Cesium.Math.toRadians(95), // 方向
         pitch: Cesium.Math.toRadians(0), // 倾斜角度
@@ -302,6 +304,9 @@ class Map extends Component {
                 // });
                 // 直接赋值
                 that.state.arrs = arrs;
+              }else if(featureId.includes('WF')) {
+                WFarrs.push(featureId);
+                that.state.WFarrs = WFarrs;
               }
               return Cesium.Color.clone(Cesium.Color.WHITE, result);
             },
@@ -316,6 +321,7 @@ class Map extends Component {
 
     that.setState({
       arrs,
+      WFarrs
     });
 
     // 跳转
@@ -435,6 +441,7 @@ class Map extends Component {
             model11={this.model11}
             scene={this.scene}
             arrs={this.state.arrs}
+            WFarrs={this.state.WFarrs}
             showModel11={this.state.showModel11}
             handleHideBuildings={this.handleHideBuildings}
             handleShowBuildings={this.handleShowBuildings}

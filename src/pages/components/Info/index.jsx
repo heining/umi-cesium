@@ -10,17 +10,17 @@ import { Select, Input, Radio, Button, message } from 'antd';
 import '../Card/index.css';
 
 const { Option } = Select;
-let styleArr = [];
-let floorArr = [];
-let Cgrass = [];
-let GFgrass = [];
-let className = '';
-let floorNum = '';
+let WFfloor = [];
+let GFfloor = [];
+let WFglass = [];
+let GFglass = [];
+// let className = '';
+// let floorNum = '';
 let Nnum = '';
-let eArrs = [];
-let nArrs = [];
-let sArrs = [];
-let wArrs = [];
+// let eArrs = [];
+// let nArrs = [];
+// let sArrs = [];
+// let wArrs = [];
 let ids = [];
 const pinBuilder = new Cesium.PinBuilder();
 const selectedEntity = new Cesium.Entity();
@@ -35,12 +35,12 @@ class Info extends Component {
       // ids: '',
       // arrs: [],
       style: '',
-      styleName: '',
-      floor: '',
-      styleArr: [],
-      floorArr: [],
-      Cgrass: [],
-      GFgrass: [],
+      WFf: '',
+      GFf: '',
+      WFfloor: [],
+      GFfloor: [],
+      WFglass: [],
+      GFglass: [],
       value: '',
       showProblemStatus: false,
       detected1: '',
@@ -52,71 +52,95 @@ class Info extends Component {
       buttonISClick: false,
       PodiumArea: 0,
       mainArea: 0,
+      PodiumNum: 0,
+      mainNum: 0,
     };
   }
 
   handleStyleChange = e => {
     console.log(e);
-    const arrs = this.props.arrs;
-    eArrs = [];
-    nArrs = [];
-    sArrs = [];
-    wArrs = [];
+    // 玻璃集合
+    let arrs = this.props.arrs;
+    // 石材集合
+    let WFarrs = this.props.WFarrs;
+    // eArrs = [];
+    // nArrs = [];
+    // sArrs = [];
+    // wArrs = [];
+    // if (arrs) {
+    //   arrs.map((item, index) => {
+    //     className = item.split('(')[1].split(')')[0];
+    //     let floor = item.split('F')[1];
+    //     floorNum = parseInt(floor);
+    //     Nnum = item.slice(4, 6);
+    //     if (Nnum >= 70 && Nnum <= 107) {
+    //       eArrs.push(item);
+    //     } else if (Nnum >= 1 && Nnum <= 15) {
+    //       nArrs.push(item);
+    //     } else if (Nnum >= 54 && Nnum <= 69) {
+    //       sArrs.push(item);
+    //     } else {
+    //       wArrs.push(item);
+    //     }
+    //     // floorNum = item.split(')'[1]);
+    //     styleArr.push(className);
+    //     floorArr.push(floorNum);
+    //     // 数组去重
+    //     styleArr = Array.from(new Set(styleArr));
+    //     floorArr = Array.from(new Set(floorArr));
+    //   });
+    // }
     if (arrs) {
       arrs.map((item, index) => {
-        className = item.split('(')[1].split(')')[0];
-        let floor = item.split('F')[1];
-        floorNum = parseInt(floor)
-        Nnum = item.slice(4, 6);
-        if (Nnum >= 70 && Nnum <= 107) {
-          eArrs.push(item);
-        } else if (Nnum >= 1 && Nnum <= 15) {
-          nArrs.push(item);
-        } else if (Nnum >= 54 && Nnum <= 69) {
-          sArrs.push(item);
-        } else {
-          wArrs.push(item);
-        }
-        // floorNum = item.split(')'[1]);
-        styleArr.push(className);
-        floorArr.push(floorNum);
-        // 数组去重
-        styleArr = Array.from(new Set(styleArr));
-        floorArr = Array.from(new Set(floorArr));
+        let f = parseInt(item.split('F')[1]);
+        GFfloor.push(f);
       });
+      GFfloor = Array.from(new Set(GFfloor));
+    }
+    if (WFarrs) {
+      WFarrs.map((item, index) => {
+        let f = parseInt(item.split('F')[1]);
+        WFfloor.push(f);
+      });
+      WFfloor = Array.from(new Set(WFfloor));
+      console.log(WFfloor);
     }
     this.setState({
       style: e,
       arrs,
-      styleArr,
-      floorArr,
+      WFfloor,
+      GFfloor,
     });
+
     // 跳转
     // this.props.viewer.flyTo(this.props.jyds);
   };
 
-  handleCChange = e => {
+  handleWFChange = e => {
     console.log(e);
     this.setState({
-      styleName: e,
+      WFf: e,
     });
-    this.selectCColor(this.props.jyds, e);
+    this.selectWFColor(this.props.jyds, e);
   };
 
-  // 设置选中同一类的颜色
-  selectCColor = (target, styleName) => {
+  // 设置选中同一层石材的颜色
+  selectWFColor = (target, floor) => {
+    let v = 'WF' + floor.toString();
+    console.log(v)
     const that = this;
-    Cgrass = [];
+    WFglass = [];
     target.style = new Cesium.Cesium3DTileStyle({
       // show: true,
       color: {
         evaluateColor: function(feature, result) {
           const featureId = feature.getProperty('id');
-          if (featureId.includes(styleName)) {
-            Cgrass.push(featureId);
-            Cgrass = Array.from(new Set(Cgrass));
+          if (featureId.includes(v)) {
+            WFglass.push(featureId);
+            WFglass = Array.from(new Set(WFglass));
+            console.log(WFglass)
             that.setState({
-              Cgrass,
+              WFglass,
             });
             return Cesium.Color.clone(Cesium.Color.BLUE, result);
           } else {
@@ -128,29 +152,29 @@ class Info extends Component {
   };
 
   handleGFChange = e => {
-    console.log(e);
-
+    console.log(e)
     this.setState({
-      floor: e,
+      GFf: e,
     });
     this.selectGFColor(this.props.jyds, e);
   };
 
   // 设置选中同一楼层的颜色
   selectGFColor = (target, floor) => {
+    let v = 'GF' + floor.toString();
     const that = this;
-    GFgrass = [];
-    console.log(target);
+    GFglass = [];
     target.style = new Cesium.Cesium3DTileStyle({
       // show: true,
       color: {
         evaluateColor: function(feature, result) {
           const featureId = feature.getProperty('id');
-          if (featureId.includes(floor)) {
-            GFgrass.push(featureId);
-            GFgrass = Array.from(new Set(GFgrass));
+          if (featureId.includes(v)) {
+            GFglass.push(featureId);
+            GFglass = Array.from(new Set(GFglass));
+            console.log(GFglass)
             that.setState({
-              GFgrass,
+              GFglass,
             });
             return Cesium.Color.clone(Cesium.Color.GREEN, result);
           } else {
@@ -163,7 +187,6 @@ class Info extends Component {
 
   // 玻璃改变
   handleGlassChange = e => {
-    console.log(e);
     // 选中效果
     this.props.jyds.style = new Cesium.Cesium3DTileStyle({
       // show: true,
@@ -306,6 +329,7 @@ class Info extends Component {
 
   // 7个问题，7种颜色
   handleProblemChange = e => {
+    console.log(e);
     const that = this;
     ids = [];
     that.setState({
@@ -330,7 +354,10 @@ class Info extends Component {
           message.info('查询失败，请重试！');
         }
         that.setColor(that.props.jyds, ids, Color[e]);
-        that.damagedArea(ids);
+        if (e == 3) {
+          console.log('ning');
+          that.damagedArea(ids);
+        }
       })
       .catch(function(error) {
         console.log(error);
@@ -384,6 +411,7 @@ class Info extends Component {
         pnum2 = pnum2 + 1;
       }
     });
+    let PodiumNum = pnum1 + pnum2;
     PodiumArea = 3.3 * pnum1 + 1.6 * pnum2;
     // console.log(PodiumArea.toFixed(3))
     mainBuilding.map((item, index) => {
@@ -401,11 +429,14 @@ class Info extends Component {
         }
       }
     });
+    let mainNum = mnum1 + mnum2 + mnum3 + mnum4;
     mainArea = 3.3 * mnum1 + 0.8 * mnum2 + 3.6 * mnum3 + 0.75 * mnum4;
     // console.log(mainArea.toFixed(3))
     this.setState({
       PodiumArea: PodiumArea.toFixed(3),
       mainArea: mainArea.toFixed(3),
+      mainNum,
+      PodiumNum,
     });
   };
 
@@ -423,7 +454,7 @@ class Info extends Component {
   };
 
   handleEast = () => {
-    this.flyTo(121.506817, 31.247081, 150.0, -140);
+    this.flyTo(121.504148, 31.245008, 150.0, -140);
   };
 
   handleSouth = () => {
@@ -431,27 +462,26 @@ class Info extends Component {
   };
 
   handleWest = () => {
-    this.flyTo(121.495657, 31.236170, 150.0, 40);
+    this.flyTo(121.495657, 31.23617, 150.0, 40);
   };
 
   handleNorth = () => {
     this.flyTo(121.492771, 31.245409, 150.0, 130);
   };
-
   // handleEast = () => {
-  //   this.flyTo(121.500511, 31.242533, 100.0, -140);
+  //   this.flyTo(121.506817, 31.247081, 150.0, -140);
   // };
 
   // handleSouth = () => {
-  //   this.flyTo(121.501162, 31.24025, 100.0, -50);
+  //   this.flyTo(121.505792, 31.236161, 150.0, -50);
   // };
 
   // handleWest = () => {
-  //   this.flyTo(121.498733, 31.240147, 100.0, 40);
+  //   this.flyTo(121.495657, 31.23617, 150.0, 40);
   // };
 
   // handleNorth = () => {
-  //   this.flyTo(121.498322, 31.241935, 100.0, 130);
+  //   this.flyTo(121.492771, 31.245409, 150.0, 130);
   // };
 
   render() {
@@ -477,12 +507,12 @@ class Info extends Component {
           >
             幕墙信息
           </div>
-          <div
+          {/* <div
             style={{ marginBottom: 5, textDecoration: 'underline', width: 100, float: 'left' }}
             onClick={this.props.handleShowInfo}
           >
             构件信息
-          </div>
+          </div> */}
         </div>
 
         {/* 新增功能，date: 2020-07-02 */}
@@ -509,7 +539,9 @@ class Info extends Component {
               检测状态
             </Radio> */}
           </Radio.Group>
-          <Button ghost onClick={this.props.jydsPosition}>视图复位</Button>
+          <Button ghost onClick={this.props.jydsPosition}>
+            视图复位
+          </Button>
         </div>
         {/* 新增功能, date: 2020-07-04, 立面信息 */}
         {/* <div className="infoline" style={{ width: 500 }}>
@@ -543,17 +575,17 @@ class Info extends Component {
             style={{ width: 100, marginRight: 20, float: 'left', background: 'transparent ' }}
             onChange={this.handleStyleChange}
           >
-            <Option value="C">幕墙类型</Option>
-            <Option value="GF">楼层</Option>
+            <Option value="GF">玻璃</Option>
+            <Option value="WF">石材</Option>
           </Select>
-          {this.state.style == 'C' ? (
+          {this.state.style == 'GF' ? (
             <>
               <Select
-                placeholder={'请选择幕墙类型'}
+                placeholder={'请选择楼层'}
                 style={{ width: 100, marginRight: 20, float: 'left' }}
-                onChange={this.handleCChange}
+                onChange={this.handleGFChange}
               >
-                {this.state.styleArr.map((item, index) => (
+                {this.state.GFfloor.map((item, index) => (
                   <Option value={item} key={index}>
                     {item}
                   </Option>
@@ -564,7 +596,7 @@ class Info extends Component {
                 style={{ width: 200, marginRight: 20, float: 'left' }}
                 onChange={this.handleGlassChange}
               >
-                {this.state.Cgrass.map((item, index) => (
+                {this.state.GFglass.map((item, index) => (
                   <Option value={item} key={index}>
                     {item}
                   </Option>
@@ -574,14 +606,14 @@ class Info extends Component {
           ) : (
             <div style={{ float: 'left' }}></div>
           )}
-          {this.state.style == 'GF' ? (
+          {this.state.style == 'WF' ? (
             <>
               <Select
                 placeholder={'请选择楼层'}
                 style={{ width: 100, marginRight: 20, float: 'left' }}
-                onChange={this.handleGFChange}
+                onChange={this.handleWFChange}
               >
-                {this.state.floorArr.map((item, index) => (
+                {this.state.WFfloor.map((item, index) => (
                   <Option value={item} key={index}>
                     {item}
                   </Option>
@@ -592,7 +624,7 @@ class Info extends Component {
                 style={{ width: 200, marginRight: 20, float: 'left' }}
                 onChange={this.handleGlassChange}
               >
-                {this.state.GFgrass.map((item, index) => (
+                {this.state.GFglass.map((item, index) => (
                   <Option value={item} key={index}>
                     {item}
                   </Option>
@@ -641,27 +673,21 @@ class Info extends Component {
               className="colorline"
               style={{
                 justifyContent: 'flex-start',
-                float: 'left',
                 marginTop: 10,
-                marginRight: 135,
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', float: 'left' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
                 <span style={{ fontSize: 12, marginLeft: 10 }}>幕墙面板问题</span>
               </div>
             </div>
-            <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span className="colorbox" style={{ backgroundColor: 'orange' }}></span>
                 <span style={{ fontSize: 12, marginLeft: 10 }}>外露构件问题</span>
               </div>
             </div>
-            <br />
-            <div
-              className="colorline"
-              style={{ justifyContent: 'flex-start', float: 'left', marginRight: 28 }}
-            >
+            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span className="colorbox" style={{ backgroundColor: 'yellow' }}></span>
                 <span style={{ fontSize: 12, marginLeft: 10 }}>承力构件、连接件、连接螺栓问题</span>
@@ -671,16 +697,17 @@ class Info extends Component {
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
                 <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮密封胶、胶条问题</span>
-                <span>主楼玻璃破损：{this.state.PodiumArea}</span>
-                <span>主楼破损总面积：{this.state.PodiumArea}</span>
-                <span>裙楼破损总面积：{this.state.mainArea}</span>
+                <hr />
+                <div>
+                  <span style={{ marginLeft: 68 }}>主楼幕墙破损：{this.state.PodiumNum}块</span>
+                  <span style={{ marginLeft: 20 }}>主楼破损面积：{this.state.PodiumArea} </span>
+                  <br />
+                  <span style={{ marginLeft: 65 }}>裙楼幕墙破损：{this.state.mainNum}块</span>
+                  <span style={{ marginLeft: 20 }}>裙楼破损面积：{this.state.mainArea}</span>
+                </div>
               </div>
             </div>
-            <br />
-            <div
-              className="colorline"
-              style={{ justifyContent: 'flex-start', float: 'left', marginRight: 135 }}
-            >
+            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span className="colorbox" style={{ backgroundColor: 'black' }}></span>
                 <span style={{ fontSize: 12, marginLeft: 10 }}>开启部分问题</span>
@@ -692,7 +719,6 @@ class Info extends Component {
                 <span style={{ fontSize: 12, marginLeft: 10 }}>幕墙排水系统问题</span>
               </div>
             </div>
-            <br />
             <div className="colorline" style={{ justifyContent: 'flex-start' }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span className="colorbox" style={{ backgroundColor: 'purple' }}></span>

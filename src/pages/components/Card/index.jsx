@@ -7,6 +7,7 @@ import QRCode from 'qrcode.react';
 import './index.css';
 
 let url = [];
+let arrAll = [];
 
 class Card extends Component {
   constructor(props) {
@@ -19,6 +20,7 @@ class Card extends Component {
       showUpload: true,
       files: [],
       url: [],
+      arrAll: [],
     };
     console.log(this.props.id);
   }
@@ -189,69 +191,33 @@ class Card extends Component {
     console.log(id.split(')')[1].split('0')[0]);
     if (id.split(')')[1].split('0')[0] == 'WF') {
       if (id.split('(')[1].split(')')[0] == 'C01' && id.slice(1, 2) == 'L0') {
-        return (
-          <span>
-            4700 x 4100
-          </span>
-        );
+        return <span>4700 x 4100</span>;
       } else if (id.slice(1, 2) == 'L1') {
         if (id.split('(')[1].split(')')[0] == 'C03') {
-          return (
-            <span>
-             500 x 500
-            </span>
-          );
+          return <span>500 x 500</span>;
         } else {
-          return (
-            <span>
-              500 x 1500
-            </span>
-          );
+          return <span>500 x 1500</span>;
         }
       }
     } else if (id.split(')')[1].split('0')[0] == 'GF') {
       switch (id.split('(')[1].split(')')[0]) {
         case 'C01':
-          return (
-            <span>
-              1100 x 3000
-            </span>
-          );
+          return <span>1100 x 3000</span>;
           break;
         case 'C02':
-          return (
-            <span>
-              1500 x 1100
-            </span>
-          );
+          return <span>1500 x 1100</span>;
           break;
         case 'C03':
-          return (
-            <span>
-              750 x 1100
-            </span>
-          );
+          return <span>750 x 1100</span>;
           break;
         case 'C04':
-          return (
-            <span>
-             410 x 1700
-            </span>
-          );
+          return <span>410 x 1700</span>;
           break;
         case 'C05':
-          return (
-            <span>
-             3100 x 1800
-            </span>
-          );
+          return <span>3100 x 1800</span>;
           break;
         case 'C06':
-          return (
-            <span>
-             1000 x 1000
-            </span>
-          );
+          return <span>1000 x 1000</span>;
           break;
         default:
           break;
@@ -261,13 +227,35 @@ class Card extends Component {
 
   // 玻璃状态
   statusRender = () => {
-    console.log(this.state.url)
-    if(this.state.url) {
+    const that = this;
+    for (let i = 0; i < 7; i++) {
+      // 请求问题玻璃的所有id
+      const formData = new FormData();
+      formData.append('state', Math.pow(2, i));
+      request
+        .post('api/v1/get/matter/glass', {
+          data: formData,
+        })
+        .then(function(response) {
+          if (response) {
+            response.map((item, index) => {
+              arrAll.push(item.raw_id);
+            });
+            that.state.arrAll = arrAll;
+          } else {
+            message.info('查询失败，请重试！');
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+      });
+    }
+    if(arrAll.includes(that.props.id)) {
       return '破损'
     }else {
       return '正常'
     }
-  }
+  };
 
   // 单选按钮切换
   onChange = e => {
@@ -336,10 +324,7 @@ class Card extends Component {
               style={{ width: '70%', height: '70%' }}
             />
           ) : (
-            <Zmage
-              src={require('@/assets/good.jpg')}
-              style={{ width: '70%', height: '70%' }}
-            />
+            <Zmage src={require('@/assets/good.jpg')} style={{ width: '70%', height: '70%' }} />
           )}
         </div>
         <div className="infoline">
