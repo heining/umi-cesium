@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import * as Cesium from 'cesium';
 import Info from './Info/index';
+import GlassInfo from './Info/GlassInfo';
 import BuildInfo from './Info/BuildInfo';
 // import DetailInfo from './Info/DetailInfo';
 import { Input, Button, message } from 'antd';
@@ -22,7 +23,7 @@ class Map extends Component {
       showHistory: false,
       showBuildings: true,
       showBuildInfo: false,
-      showDetailInfo: false,
+      showGlassInfo: false,
       IsLogin: false,
       nameValue: '',
       passValue: ''
@@ -123,12 +124,6 @@ class Map extends Component {
     }
   };
 
-  closeInfo = () => {
-    this.setState({
-      showDetail: false,
-    });
-  };
-
   showhistory = () => {
     this.setState({
       showHistory: true,
@@ -162,6 +157,21 @@ class Map extends Component {
       });
   };
 
+  // 幕墙信息
+  handleShowGlassInfo = () => {
+    this.setState({
+      showGlassInfo: true,
+    });
+  };
+
+  handleHideGlassInfo = () => {
+    this.setState({
+      showGlassInfo: false,
+    });
+  };
+
+  // 建筑信息
+
   handleShowBuildInfo = () => {
     this.setState({
       showBuildInfo: true,
@@ -171,6 +181,19 @@ class Map extends Component {
   handleHideBuildInfo = () => {
     this.setState({
       showBuildInfo: false,
+    });
+  };
+
+  // 构件信息
+  handleShowInfo = () => {
+    this.setState({
+      showDetail: true,
+    });
+  };
+
+  closeInfo = () => {
+    this.setState({
+      showDetail: false,
     });
   };
 
@@ -212,6 +235,18 @@ class Map extends Component {
   flyTO = target => {
     this.viewer.flyTo(target);
   };
+
+  jydsPosition = () => {
+    this.viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(121.491061, 31.241369, 150), // 设置位置
+      orientation: {
+        heading: Cesium.Math.toRadians(95), // 方向
+        pitch: Cesium.Math.toRadians(0), // 倾斜角度
+        roll: 0,
+      },
+      duration: 2, // 设置飞行持续时间，默认会根据距离来计算
+    });
+  }
 
   componentDidMount() {
     // let script = document.createElement('script');
@@ -283,6 +318,9 @@ class Map extends Component {
       arrs,
     });
 
+    // 跳转
+    this.jydsPosition()
+    
     // 定位
     // viewer.zoomTo(jyds);
 
@@ -400,9 +438,12 @@ class Map extends Component {
             showModel11={this.state.showModel11}
             handleHideBuildings={this.handleHideBuildings}
             handleShowBuildings={this.handleShowBuildings}
+            handleShowGlassInfo={this.handleShowGlassInfo}
             handleShowBuildInfo={this.handleShowBuildInfo}
+            handleShowInfo={this.handleShowInfo}
+            jydsPosition={this.jydsPosition}
           />
-          {/* 玻璃详细信息 */}
+          {/* 构件信息 */}
           {this.state.showDetail ? (
             <Card
               style={{ position: 'absolute' }}
@@ -424,11 +465,21 @@ class Map extends Component {
             <div></div>
           )}
 
-          {/* 建筑幕墙信息 */}
-          {this.state.showBuildInfo ? (
+            {/* 建筑信息 */}
+            {this.state.showBuildInfo ? (
             <BuildInfo
               handleHideBuildInfo={this.handleHideBuildInfo}
-              handleShowDetailInfo={this.handleShowDetailInfo}
+              // handleShowDetailInfo={this.handleShowDetailInfo}
+            />
+          ) : (
+            <div></div>
+          )}
+
+          {/* 幕墙信息 */}
+          {this.state.showGlassInfo ? (
+            <GlassInfo
+              handleHideGlassInfo={this.handleHideGlassInfo}
+              // handleShowDetailInfo={this.handleShowDetailInfo}
             />
           ) : (
             <div></div>
