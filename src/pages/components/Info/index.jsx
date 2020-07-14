@@ -7,6 +7,7 @@ import React, { Component } from 'react';
 import request from 'umi-request';
 import * as Cesium from 'cesium';
 import { Select, Input, Radio, Button, message } from 'antd';
+import { getEffect } from './getEffect';
 import '../Card/index.css';
 
 const { Option } = Select;
@@ -22,6 +23,7 @@ let Nnum = '';
 // let sArrs = [];
 // let wArrs = [];
 let ids = [];
+let arrAll = [];
 const pinBuilder = new Cesium.PinBuilder();
 const selectedEntity = new Cesium.Entity();
 const Color = ['RED', 'ORANGE', 'YELLOW', 'RED', 'BLACK', 'BLUE', 'PURPLE'];
@@ -32,7 +34,7 @@ class Info extends Component {
     super(props);
     this.state = {
       id: '',
-      // ids: '',
+      ids3: '',
       // arrs: [],
       style: '',
       WFf: '',
@@ -42,7 +44,7 @@ class Info extends Component {
       WFglass: [],
       GFglass: [],
       value: '',
-      showProblemStatus: false,
+      state: '',
       detected1: '',
       detected2: '',
       detected3: '',
@@ -54,6 +56,11 @@ class Info extends Component {
       mainArea: 0,
       PodiumNum: 0,
       mainNum: 0,
+      num: 0,
+      area: 0,
+      allNum: 0,
+      allArea: 0,
+      arrAll: [],
     };
   }
 
@@ -92,10 +99,13 @@ class Info extends Component {
     // }
     if (arrs) {
       arrs.map((item, index) => {
-        let f = parseInt(item.split('F')[1]);
-        GFfloor.push(f);
+        let f = parseInt(item.slice(15, 17));
+        if (f) {
+          GFfloor.push(f);
+        }
       });
       GFfloor = Array.from(new Set(GFfloor));
+      GFfloor = GFfloor.sort();
     }
     if (WFarrs) {
       WFarrs.map((item, index) => {
@@ -103,7 +113,7 @@ class Info extends Component {
         WFfloor.push(f);
       });
       WFfloor = Array.from(new Set(WFfloor));
-      console.log(WFfloor);
+      WFfloor = WFfloor.sort();
     }
     this.setState({
       style: e,
@@ -111,7 +121,6 @@ class Info extends Component {
       WFfloor,
       GFfloor,
     });
-
     // 跳转
     // this.props.viewer.flyTo(this.props.jyds);
   };
@@ -126,8 +135,6 @@ class Info extends Component {
 
   // 设置选中同一层石材的颜色
   selectWFColor = (target, floor) => {
-    let v = 'WF' + floor.toString();
-    console.log(v)
     const that = this;
     WFglass = [];
     target.style = new Cesium.Cesium3DTileStyle({
@@ -135,10 +142,9 @@ class Info extends Component {
       color: {
         evaluateColor: function(feature, result) {
           const featureId = feature.getProperty('id');
-          if (featureId.includes(v)) {
+          if (that.props.WFarrs.includes(featureId) && featureId.includes(floor)) {
             WFglass.push(featureId);
             WFglass = Array.from(new Set(WFglass));
-            console.log(WFglass)
             that.setState({
               WFglass,
             });
@@ -152,7 +158,7 @@ class Info extends Component {
   };
 
   handleGFChange = e => {
-    console.log(e)
+    console.log(e);
     this.setState({
       GFf: e,
     });
@@ -161,7 +167,6 @@ class Info extends Component {
 
   // 设置选中同一楼层的颜色
   selectGFColor = (target, floor) => {
-    let v = 'GF' + floor.toString();
     const that = this;
     GFglass = [];
     target.style = new Cesium.Cesium3DTileStyle({
@@ -169,10 +174,9 @@ class Info extends Component {
       color: {
         evaluateColor: function(feature, result) {
           const featureId = feature.getProperty('id');
-          if (featureId.includes(v)) {
+          if (that.props.arrs.includes(featureId) && featureId.includes(floor)) {
             GFglass.push(featureId);
             GFglass = Array.from(new Set(GFglass));
-            console.log(GFglass)
             that.setState({
               GFglass,
             });
@@ -333,7 +337,7 @@ class Info extends Component {
     const that = this;
     ids = [];
     that.setState({
-      showProblemStatus: true,
+      state: e,
     });
     // 请求问题玻璃的所有id
     const formData = new FormData();
@@ -355,13 +359,84 @@ class Info extends Component {
         }
         that.setColor(that.props.jyds, ids, Color[e]);
         if (e == 3) {
-          console.log('ning');
           that.damagedArea(ids);
+          that.setState({
+            ids3: ids,
+          });
+        } else if (e == 7) {
+          that.getAllArea();
+        } else {
+          that.area(ids);
+        }
+        if (e == 0 || e == 3 || e == 7) {
+          // 北面
+          that.flyTo(121.495592, 31.2439895, 120.0, 130);
+        } else if (e == 6) {
+          // 南面
+          that.flyTo(121.503292, 31.2385895, 120.0, -50);
+        } else {
+          // 初始
+          that.props.viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(121.494521, 31.242109, 120.0), // 设置位置
+            orientation: {
+              heading: Cesium.Math.toRadians(100), // 方向
+              pitch: Cesium.Math.toRadians(0), // 倾斜角度
+              roll: 0,
+            },
+            duration: 2, // 设置飞行持续时间，默认会根据距离来计算
+          });
         }
       })
       .catch(function(error) {
         console.log(error);
       });
+  };
+
+  getAllArea = async () => {
+    const that = this;
+    for (let i = 0; i < 7; i++) {
+      // 请求问题玻璃的所有id
+      const formData = new FormData();
+      formData.append('state', Math.pow(2, i));
+      // 异步
+      await request
+        .post('api/v1/get/matter/glass', {
+          data: formData,
+        })
+        .then(function(response) {
+          if (response) {
+            response.map((item, index) => {
+              arrAll.push(item.raw_id);
+            });
+            that.state.arrAll = arrAll;
+          } else {
+            message.info('查询失败，请重试！');
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    }
+    that.area(arrAll);
+    that.setState({
+      allNum: arrAll.length,
+      allArea: this.state.area,
+    });
+    // 选中效果
+    that.props.jyds.style = new Cesium.Cesium3DTileStyle({
+      // show: true,
+      // feature: 切片
+      color: {
+        evaluateColor: function(feature, result) {
+          const featureId = feature.getProperty('id');
+          if (arrAll.includes(featureId)) {
+            return Cesium.Color.clone(Cesium.Color.PURPLE, result);
+          } else {
+            return Cesium.Color.clone(Cesium.Color.WHITE, result);
+          }
+        },
+      },
+    });
   };
 
   // 设置颜色,其中target：jyds, glass: 问题玻璃集合, Color 颜色集合
@@ -440,6 +515,80 @@ class Info extends Component {
     });
   };
 
+  // 问题玻璃的面积
+  // array: 问题玻璃集合
+  area = array => {
+    const that = this;
+    let Wnum1 = 0;
+    let Wnum2 = 0;
+    let Wnum3 = 0;
+    let Gnum1 = 0;
+    let Gnum2 = 0;
+    let Gnum3 = 0;
+    let Gnum4 = 0;
+    let Gnum5 = 0;
+    let Gnum6 = 0;
+    let num = 0;
+    let area = 0;
+    console.log(Gnum1, Gnum2);
+    array.map((item, Index) => {
+      console.log(item);
+      if (item.includes('WF')) {
+        if (item.split('(')[1].split(')')[0] == 'C01' && item.slice(1, 2) == 'L0') {
+          Wnum1 = Wnum1 + 1;
+          console.log(Wnum1);
+        } else if (item.slice(1, 2) == 'L1') {
+          if (item.split('(')[1].split(')')[0] == 'C03') {
+            Wnum2 = Wnum2 + 1;
+          } else {
+            Wnum3 = Wnum3 + 1;
+          }
+        }
+      } else if (item.includes('GF')) {
+        switch (item.split('(')[1].split(')')[0]) {
+          case 'C01':
+            Gnum1 = Gnum1 + 1;
+            console.log(Gnum1);
+            break;
+          case 'C02':
+            Gnum2 = Gnum2 + 1;
+            break;
+          case 'C03':
+            Gnum3 = Gnum3 + 1;
+            break;
+          case 'C04':
+            Gnum4 = Gnum4 + 1;
+            break;
+          case 'C05':
+            Gnum5 = Gnum5 + 1;
+            console.log(Gnum5);
+            break;
+          case 'C06':
+            Gnum6 = Gnum6 + 1;
+            break;
+          default:
+            break;
+        }
+      }
+    });
+    num = Wnum1 + Wnum2 + Wnum3 + Gnum1 + Gnum2 + Gnum3 + Gnum4 + Gnum5 + Gnum6;
+    area =
+      Wnum1 * 19 +
+      Wnum2 * 0.25 +
+      Wnum3 * 0.75 +
+      Gnum1 * 3.3 +
+      Gnum2 * 1.65 +
+      Gnum3 * 0.825 +
+      Gnum4 * 6.97 +
+      Gnum5 * 3.72 +
+      Gnum6 * 1;
+    console.log(num, area);
+    that.setState({
+      num,
+      area: area.toFixed(3),
+    });
+  };
+
   // 立面信息
   flyTo = (lon, lat, hight, heading) => {
     this.props.viewer.camera.flyTo({
@@ -454,35 +603,42 @@ class Info extends Component {
   };
 
   handleEast = () => {
-    this.flyTo(121.504148, 31.245008, 150.0, -140);
+    this.flyTo(121.502592, 31.2443895, 120.0, -140);
   };
 
   handleSouth = () => {
-    this.flyTo(121.505792, 31.236161, 150.0, -50);
+    this.flyTo(121.503292, 31.2385895, 120.0, -50);
   };
 
   handleWest = () => {
-    this.flyTo(121.495657, 31.23617, 150.0, 40);
+    this.flyTo(121.496292, 31.2378895, 120.0, 40);
   };
 
   handleNorth = () => {
-    this.flyTo(121.492771, 31.245409, 150.0, 130);
+    this.flyTo(121.495592, 31.2439895, 120.0, 130);
   };
-  // handleEast = () => {
-  //   this.flyTo(121.506817, 31.247081, 150.0, -140);
-  // };
 
-  // handleSouth = () => {
-  //   this.flyTo(121.505792, 31.236161, 150.0, -50);
-  // };
-
-  // handleWest = () => {
-  //   this.flyTo(121.495657, 31.23617, 150.0, 40);
-  // };
-
-  // handleNorth = () => {
-  //   this.flyTo(121.492771, 31.245409, 150.0, 130);
-  // };
+  // 密封胶受影响区
+  handleEffect = () => {
+    let effectArr = [];
+    const that = this;
+    that.state.ids3.map((item, index) => {
+      effectArr = effectArr.concat(getEffect(item));
+    });
+    that.props.jyds.style = new Cesium.Cesium3DTileStyle({
+      // show: true,
+      color: {
+        evaluateColor: function(feature, result) {
+          const featureId = feature.getProperty('id');
+          if (effectArr.includes(featureId)) {
+            return Cesium.Color.clone(Cesium.Color.RED, result);
+          } else {
+            return Cesium.Color.clone(Cesium.Color.WHITE, result);
+          }
+        },
+      },
+    });
+  };
 
   render() {
     return (
@@ -507,12 +663,12 @@ class Info extends Component {
           >
             幕墙信息
           </div>
-          {/* <div
+          <div
             style={{ marginBottom: 5, textDecoration: 'underline', width: 100, float: 'left' }}
             onClick={this.props.handleShowInfo}
           >
             构件信息
-          </div> */}
+          </div>
         </div>
 
         {/* 新增功能，date: 2020-07-02 */}
@@ -624,7 +780,7 @@ class Info extends Component {
                 style={{ width: 200, marginRight: 20, float: 'left' }}
                 onChange={this.handleGlassChange}
               >
-                {this.state.GFglass.map((item, index) => (
+                {this.state.WFglass.map((item, index) => (
                   <Option value={item} key={index}>
                     {item}
                   </Option>
@@ -665,67 +821,120 @@ class Info extends Component {
             <Option value="4">开启部分问题</Option>
             <Option value="5">幕墙排水系统问题</Option>
             <Option value="6">硅酮结构密封胶、粘接性能问题</Option>
+            <Option value="7">全部问题</Option>
           </Select>
         </div>
-        {this.state.showProblemStatus ? (
-          <>
-            <div
-              className="colorline"
-              style={{
-                justifyContent: 'flex-start',
-                marginTop: 10,
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
-                <span style={{ fontSize: 12, marginLeft: 10 }}>幕墙面板问题</span>
+        {this.state.state == '0' ? (
+          <div
+            className="colorline"
+            style={{
+              justifyContent: 'flex-start',
+              marginTop: 10,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
+              <span style={{ fontSize: 12, marginLeft: 10 }}>幕墙面板问题</span>
+              <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num}块</span>
+              <span style={{ marginLeft: 20 }}>破损面积：{this.state.area} </span>
+            </div>
+          </div>
+        ) : (
+          <div></div>
+        )}
+        {this.state.state == '1' ? (
+          <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span className="colorbox" style={{ backgroundColor: 'orange' }}></span>
+              <span style={{ fontSize: 12, marginLeft: 10 }}>外露构件问题</span>
+              <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num}块</span>
+              <span style={{ marginLeft: 20 }}>破损面积：{this.state.area} </span>
+            </div>
+          </div>
+        ) : (
+          <div></div>
+        )}
+        {this.state.state == '2' ? (
+          <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span className="colorbox" style={{ backgroundColor: 'yellow' }}></span>
+              <span style={{ fontSize: 12, marginLeft: 10 }}>承力构件、连接件、连接螺栓问题</span>
+              <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num}块</span>
+              <span style={{ marginLeft: 20 }}>破损面积：{this.state.area} </span>
+            </div>
+          </div>
+        ) : (
+          <div></div>
+        )}
+        {this.state.state == '3' ? (
+          <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
+              <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮密封胶、胶条问题</span>
+              <hr />
+              <div>
+                <span style={{ marginLeft: 68 }}>主楼幕墙破损：{this.state.PodiumNum}块</span>
+                <span style={{ marginLeft: 20 }}>主楼破损面积：{this.state.PodiumArea} </span>
+                <br />
+                <span style={{ marginLeft: 65 }}>裙楼幕墙破损：{this.state.mainNum}块</span>
+                <span style={{ marginLeft: 20 }}>裙楼破损面积：{this.state.mainArea}</span>
+                <br />
+                <Button ghost onClick={this.handleEffect} style={{ marginTop: 10 }}>
+                  密封胶受影响区域
+                </Button>
               </div>
             </div>
-            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span className="colorbox" style={{ backgroundColor: 'orange' }}></span>
-                <span style={{ fontSize: 12, marginLeft: 10 }}>外露构件问题</span>
-              </div>
+          </div>
+        ) : (
+          <div></div>
+        )}
+
+        {this.state.state == '4' ? (
+          <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span className="colorbox" style={{ backgroundColor: 'black' }}></span>
+              <span style={{ fontSize: 12, marginLeft: 10 }}>开启部分问题</span>
+              <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num}块</span>
+              <span style={{ marginLeft: 20 }}>破损面积：{this.state.area} </span>
             </div>
-            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span className="colorbox" style={{ backgroundColor: 'yellow' }}></span>
-                <span style={{ fontSize: 12, marginLeft: 10 }}>承力构件、连接件、连接螺栓问题</span>
-              </div>
+          </div>
+        ) : (
+          <div></div>
+        )}
+
+        {this.state.state == '5' ? (
+          <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span className="colorbox" style={{ backgroundColor: 'blue' }}></span>
+              <span style={{ fontSize: 12, marginLeft: 10 }}>幕墙排水系统问题</span>
+              <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num}块</span>
+              <span style={{ marginLeft: 20 }}>破损面积：{this.state.area} </span>
             </div>
-            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
-                <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮密封胶、胶条问题</span>
-                <hr />
-                <div>
-                  <span style={{ marginLeft: 68 }}>主楼幕墙破损：{this.state.PodiumNum}块</span>
-                  <span style={{ marginLeft: 20 }}>主楼破损面积：{this.state.PodiumArea} </span>
-                  <br />
-                  <span style={{ marginLeft: 65 }}>裙楼幕墙破损：{this.state.mainNum}块</span>
-                  <span style={{ marginLeft: 20 }}>裙楼破损面积：{this.state.mainArea}</span>
-                </div>
-              </div>
+          </div>
+        ) : (
+          <div></div>
+        )}
+
+        {this.state.state == '6' ? (
+          <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span className="colorbox" style={{ backgroundColor: 'purple' }}></span>
+              <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮结构密封胶、粘接性能问题</span>
+              <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num}块</span>
+              <span style={{ marginLeft: 20 }}>破损面积：{this.state.area} </span>
             </div>
-            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span className="colorbox" style={{ backgroundColor: 'black' }}></span>
-                <span style={{ fontSize: 12, marginLeft: 10 }}>开启部分问题</span>
-              </div>
+          </div>
+        ) : (
+          <div></div>
+        )}
+
+        {this.state.state == '7' ? (
+          <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span style={{ marginLeft: 68 }}>幕墙总破损：{this.state.allNum}块</span>
+              <span style={{ marginLeft: 20 }}>破损总面积：{this.state.allArea} </span>
             </div>
-            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span className="colorbox" style={{ backgroundColor: 'blue' }}></span>
-                <span style={{ fontSize: 12, marginLeft: 10 }}>幕墙排水系统问题</span>
-              </div>
-            </div>
-            <div className="colorline" style={{ justifyContent: 'flex-start' }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span className="colorbox" style={{ backgroundColor: 'purple' }}></span>
-                <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮结构密封胶、粘接性能问题</span>
-              </div>
-            </div>
-          </>
+          </div>
         ) : (
           <div></div>
         )}

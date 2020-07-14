@@ -3,6 +3,7 @@ import * as Cesium from 'cesium';
 import Info from './Info/index';
 import GlassInfo from './Info/GlassInfo';
 import BuildInfo from './Info/BuildInfo';
+import MemberInfo from './Info/MemberInfo';
 // import DetailInfo from './Info/DetailInfo';
 import { Input, Button, message } from 'antd';
 import Card from './Card/index';
@@ -28,7 +29,7 @@ class Map extends Component {
       showGlassInfo: false,
       IsLogin: false,
       nameValue: '',
-      passValue: ''
+      passValue: '',
     };
   }
 
@@ -189,9 +190,15 @@ class Map extends Component {
   // 构件信息
   handleShowInfo = () => {
     this.setState({
-      showDetail: true,
+      showMemberInfo: true,
     });
   };
+
+  handleHideMemberInfo = () => {
+    this.setState({
+      showMemberInfo: false,
+    });
+  }
 
   closeInfo = () => {
     this.setState({
@@ -199,28 +206,28 @@ class Map extends Component {
     });
   };
 
-  handleName = (e) => {
-    console.log(e.target.value)
+  handleName = e => {
+    console.log(e.target.value);
     this.setState({
-      nameValue: e.target.value
-    })
-    if(this.state.nameValue !== 'inskylab') {
-      message.info('用户名错误，请重新输入')
+      nameValue: e.target.value,
+    });
+    if (this.state.nameValue !== 'inskylab') {
+      message.info('用户名错误，请重新输入');
     }
   };
-  handlePass = (e) => {
-    console.log(e.target.value)
+  handlePass = e => {
+    console.log(e.target.value);
     this.setState({
-      PassValue: e.target.value
-    })
-    if(this.state.nameValue !== '123456') {
-      message.info('密码错误，请重新输入')
+      PassValue: e.target.value,
+    });
+    if (this.state.nameValue !== '123456') {
+      message.info('密码错误，请重新输入');
     }
   };
 
   handleClick = () => {
-    message.info('登录成功')
-  }
+    message.info('登录成功');
+  };
 
   // handleShowDetailInfo = () => {
   //   this.setState({
@@ -240,15 +247,15 @@ class Map extends Component {
 
   jydsPosition = () => {
     this.viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(121.492921, 31.241909, 150), // 设置位置
+      destination: Cesium.Cartesian3.fromDegrees(121.494521, 31.242109, 120.0), // 设置位置
       orientation: {
-        heading: Cesium.Math.toRadians(95), // 方向
+        heading: Cesium.Math.toRadians(100), // 方向
         pitch: Cesium.Math.toRadians(0), // 倾斜角度
         roll: 0,
       },
       duration: 2, // 设置飞行持续时间，默认会根据距离来计算
     });
-  }
+  };
 
   componentDidMount() {
     // let script = document.createElement('script');
@@ -304,7 +311,7 @@ class Map extends Component {
                 // });
                 // 直接赋值
                 that.state.arrs = arrs;
-              }else if(featureId.includes('WF')) {
+              } else if (featureId.includes('WF')) {
                 WFarrs.push(featureId);
                 that.state.WFarrs = WFarrs;
               }
@@ -321,12 +328,12 @@ class Map extends Component {
 
     that.setState({
       arrs,
-      WFarrs
+      WFarrs,
     });
 
     // 跳转
-    this.jydsPosition()
-    
+    this.jydsPosition();
+
     // 定位
     // viewer.zoomTo(jyds);
 
@@ -375,7 +382,7 @@ class Map extends Component {
       //       backgroundColor: 'white',
       //     }}
       //   >
-          /* <Form {...layout} style={{paddingTop: '20%'}}>
+      /* <Form {...layout} style={{paddingTop: '20%'}}>
             <Form.Item
               label="用户名"
               name="username"
@@ -414,12 +421,12 @@ class Map extends Component {
               </Button>
             </Form.Item>
           </Form> */
-        //   <Input placeholder='用户名' style={{width: 300, marginBottom: 20}} maxLength={8} value={this.state.nameValue} onChange={this.handleName}/><br />
-        //   <Input placeholder ='密码' style={{width: 300, marginBottom: 20}} maxLength={12} value={this.state.passValue} onChange={this.handlePass}/><br />
-        //   <Button onClick={this.handleClick}>登录</Button>
-        // </div>
-        <div id="cesiumContainer" style={{ width: '100vw', height: '100vh' }}>
-          {/* <div
+      //   <Input placeholder='用户名' style={{width: 300, marginBottom: 20}} maxLength={8} value={this.state.nameValue} onChange={this.handleName}/><br />
+      //   <Input placeholder ='密码' style={{width: 300, marginBottom: 20}} maxLength={12} value={this.state.passValue} onChange={this.handlePass}/><br />
+      //   <Button onClick={this.handleClick}>登录</Button>
+      // </div>
+      <div id="cesiumContainer" style={{ width: '100vw', height: '100vh' }}>
+        {/* <div
             style={{
               position: 'absolute',
               color: 'white',
@@ -433,72 +440,75 @@ class Map extends Component {
           >
             内部信息，请勿外传！
           </div> */}
-          {/* 交银大厦显示层 */}
-          <Info
+        {/* 交银大厦显示层 */}
+        <Info
+          style={{ position: 'absolute' }}
+          viewer={this.viewer}
+          jyds={this.jyds}
+          model11={this.model11}
+          scene={this.scene}
+          arrs={this.state.arrs}
+          WFarrs={this.state.WFarrs}
+          showModel11={this.state.showModel11}
+          handleHideBuildings={this.handleHideBuildings}
+          handleShowBuildings={this.handleShowBuildings}
+          handleShowGlassInfo={this.handleShowGlassInfo}
+          handleShowBuildInfo={this.handleShowBuildInfo}
+          handleShowInfo={this.handleShowInfo}
+          jydsPosition={this.jydsPosition}
+        />
+        {/* 构件信息 */}
+        {this.state.showDetail ? (
+          <Card
             style={{ position: 'absolute' }}
-            viewer={this.viewer}
-            jyds={this.jyds}
-            model11={this.model11}
-            scene={this.scene}
-            arrs={this.state.arrs}
-            WFarrs={this.state.WFarrs}
-            showModel11={this.state.showModel11}
-            handleHideBuildings={this.handleHideBuildings}
-            handleShowBuildings={this.handleShowBuildings}
-            handleShowGlassInfo={this.handleShowGlassInfo}
-            handleShowBuildInfo={this.handleShowBuildInfo}
-            handleShowInfo={this.handleShowInfo}
-            jydsPosition={this.jydsPosition}
+            id={this.state.id}
+            closeInfo={this.closeInfo}
+            back={v => {
+              this.setState({ glassID: v });
+            }}
+            showHistory={this.state.showHistory}
+            showhistory={this.showhistory}
           />
-          {/* 构件信息 */}
-          {this.state.showDetail ? (
-            <Card
-              style={{ position: 'absolute' }}
-              id={this.state.id}
-              closeInfo={this.closeInfo}
-              back={v => {
-                this.setState({ glassID: v });
-              }}
-              showHistory={this.state.showHistory}
-              showhistory={this.showhistory}
-            />
-          ) : (
-            <div></div>
-          )}
-          {/* 历史图片 */}
-          {this.state.showHistory ? (
-            <History closehistory={this.closehistory} glassID={this.state.glassID} />
-          ) : (
-            <div></div>
-          )}
-
-            {/* 建筑信息 */}
-            {this.state.showBuildInfo ? (
-            <BuildInfo
-              handleHideBuildInfo={this.handleHideBuildInfo}
-              // handleShowDetailInfo={this.handleShowDetailInfo}
-            />
-          ) : (
-            <div></div>
-          )}
-
-          {/* 幕墙信息 */}
-          {this.state.showGlassInfo ? (
-            <GlassInfo
-              handleHideGlassInfo={this.handleHideGlassInfo}
-              // handleShowDetailInfo={this.handleShowDetailInfo}
-            />
-          ) : (
-            <div></div>
-          )}
-
-          {/* 幕墙详细信息 */}
-          {/* {this.state.showDetailInfo ? (
+        ) : (
+          <div></div>
+        )}
+        {/* 历史图片 */}
+        {this.state.showHistory ? (
+          <History closehistory={this.closehistory} glassID={this.state.glassID} />
+        ) : (
+          <div></div>
+        )}
+        {/* 建筑信息 */}
+        {this.state.showBuildInfo ? (
+          <BuildInfo
+            handleHideBuildInfo={this.handleHideBuildInfo}
+          />
+        ) : (
+          <div></div>
+        )}
+        {/* 幕墙信息 */}
+        {this.state.showGlassInfo ? (
+          <GlassInfo
+            handleHideGlassInfo={this.handleHideGlassInfo}
+          />
+        ) : (
+          <div></div>
+        )}
+        {/* 构件信息 */}
+        {this.state.showMemberInfo ? (
+          <MemberInfo
+            handleHideMemberInfo={this.handleHideMemberInfo}
+          />
+        ) : (
+          <div></div>
+        )}
+        {/* 幕墙详细信息 */}
+        {/* {this.state.showDetailInfo ? (
             <DetailInfo handleHideDetailInfo={this.handleHideDetailInfo} />
           ) : (
             <div></div>
           )} */}
-        </div>
+      </div>
       // </div>
     );
   }

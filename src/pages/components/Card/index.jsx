@@ -140,42 +140,42 @@ class Card extends Component {
         case 'C01':
           return (
             <span>
-              0.25 m<sup>2</sup>
+              3.3 m<sup>2</sup>
             </span>
           );
           break;
         case 'C02':
           return (
             <span>
-              0.25 m<sup>2</sup>
+              1.65 m<sup>2</sup>
             </span>
           );
           break;
         case 'C03':
           return (
             <span>
-              0.25 m<sup>2</sup>
+              0.825 m<sup>2</sup>
             </span>
           );
           break;
         case 'C04':
           return (
             <span>
-              0.25 m<sup>2</sup>
+             6.97 m<sup>2</sup>
             </span>
           );
           break;
         case 'C05':
           return (
             <span>
-              0.25 m<sup>2</sup>
+              3.72 m<sup>2</sup>
             </span>
           );
           break;
         case 'C06':
           return (
             <span>
-              0.25 m<sup>2</sup>
+              1 m<sup>2</sup>
             </span>
           );
           break;
