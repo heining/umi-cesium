@@ -144,20 +144,24 @@ class Map extends Component {
   };
 
   handleShowBuildings = () => {
-    const model11 = new Cesium.Cesium3DTileset({
-      url: 'http://cdn.lesuidao.cn/ljz11/tileset.json',
-      maximumScreenSpaceError: 160, //细化程度的最大屏幕空间错误（提高清晰度）
-      maximumMemoryUsage: 1024,
-    });
-    this.model11 = model11;
-    model11.readyPromise
-      .then(model11 => {
-        this.modelRotation(model11, 5, 121.49892, 31.239405, -141.6177112372341);
-        this.scene.primitives.add(model11);
-      })
-      .otherwise(function(error) {
-        console.log(error);
+    if (this.model11) {
+      this.model11.show = true;
+    } else {
+      const model11 = new Cesium.Cesium3DTileset({
+        url: 'http://cdn.lesuidao.cn/ljz_714/tileset.json',
+        maximumScreenSpaceError: 160, //细化程度的最大屏幕空间错误（提高清晰度）
+        maximumMemoryUsage: 1024,
       });
+      this.model11 = model11;
+      model11.readyPromise
+        .then(model11 => {
+          this.modelRotation(model11, 5, 121.49892, 31.239405, -141.6177112372341);
+          this.scene.primitives.add(model11);
+        })
+        .otherwise(function(error) {
+          console.log(error);
+        });
+    }
   };
 
   // 幕墙信息
@@ -198,7 +202,7 @@ class Map extends Component {
     this.setState({
       showMemberInfo: false,
     });
-  }
+  };
 
   closeInfo = () => {
     this.setState({
@@ -480,25 +484,19 @@ class Map extends Component {
         )}
         {/* 建筑信息 */}
         {this.state.showBuildInfo ? (
-          <BuildInfo
-            handleHideBuildInfo={this.handleHideBuildInfo}
-          />
+          <BuildInfo handleHideBuildInfo={this.handleHideBuildInfo} />
         ) : (
           <div></div>
         )}
         {/* 幕墙信息 */}
         {this.state.showGlassInfo ? (
-          <GlassInfo
-            handleHideGlassInfo={this.handleHideGlassInfo}
-          />
+          <GlassInfo handleHideGlassInfo={this.handleHideGlassInfo} />
         ) : (
           <div></div>
         )}
         {/* 构件信息 */}
         {this.state.showMemberInfo ? (
-          <MemberInfo
-            handleHideMemberInfo={this.handleHideMemberInfo}
-          />
+          <MemberInfo handleHideMemberInfo={this.handleHideMemberInfo} />
         ) : (
           <div></div>
         )}
