@@ -6,12 +6,11 @@ import Zmage from 'react-zmage';
 import QRCode from 'qrcode.react';
 import './index.css';
 
-let url = [];
+let url = '';
 let arrAll = [];
 
 class Card extends Component {
   constructor(props) {
-    console.log(props);
     super(props);
     this.state = {
       ...props,
@@ -19,10 +18,10 @@ class Card extends Component {
       showDetail: true,
       showUpload: true,
       files: [],
-      url: [],
+      url: '',
       arrAll: [],
+      currentlog: {},
     };
-    console.log(this.props.id);
   }
 
   getPic = v => {
@@ -49,9 +48,11 @@ class Card extends Component {
             })
             .then(function(response) {
               if (response.length > 0) {
-                console.log(response.length);
                 currentlogID = response[response.length - 1].id;
-                console.log(currentlogID);
+        
+                that.setState({
+                  currentlog: response[response.length - 1],
+                });
                 // 通过log(历史记录)的ID查询图片
                 const formData3 = new FormData();
                 formData3.append('log_id', currentlogID);
@@ -61,13 +62,20 @@ class Card extends Component {
                   })
                   .then(function(response) {
                     if (response.result != 'failed') {
-                      console.log(response[0]);
+                  
                       url = response[0].my_file;
                       that.setState({
                         url,
                       });
-                      console.log(url);
+                 
+                    } else if (!response) {
+                      that.setState({
+                        url: '',
+                      });
                     } else {
+                      that.setState({
+                        url: '',
+                      });
                       message.info('该图片不存在，请重试！');
                     }
                   })
@@ -93,17 +101,29 @@ class Card extends Component {
   };
 
   componentDidMount() {
-    console.log('step');
+    this.state.arrAll = [];
+    url = '';
+    arrAll = [];
     this.getPic();
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    console.log(nextProps, this.props.id);
+    // console.log(nextState);
     if (nextProps.id == this.props.id) {
-      console.log('no-up');
+      // console.log('no-up');
+      this.state.url = '';
+      url = '';
+      this.state.arrAll = [];
+      this.state.currentlog = {};
+      arrAll = [];
       return true;
     } else {
-      console.log('up');
+      // console.log('up');
+      this.state.url = '';
+      url = '';
+      this.state.arrAll = [];
+      this.state.currentlog = {};
+      arrAll = [];
       this.getPic(nextProps.id);
       return true;
     }
@@ -112,7 +132,7 @@ class Card extends Component {
   // 面积
   areaRender = () => {
     const id = this.props.id;
-    console.log(id.split(')')[1].split('0')[0]);
+    // console.log(id.split(')')[1].split('0')[0]);
     if (id.split(')')[1].split('0')[0] == 'WF') {
       if (id.split('(')[1].split(')')[0] == 'C01' && id.slice(1, 2) == 'L0') {
         return (
@@ -161,7 +181,7 @@ class Card extends Component {
         case 'C04':
           return (
             <span>
-             6.97 m<sup>2</sup>
+              6.97 m<sup>2</sup>
             </span>
           );
           break;
@@ -188,7 +208,7 @@ class Card extends Component {
   // 尺寸
   sizeRender = () => {
     const id = this.props.id;
-    console.log(id.split(')')[1].split('0')[0]);
+    // console.log(id.split(')')[1].split('0')[0]);
     if (id.split(')')[1].split('0')[0] == 'WF') {
       if (id.split('(')[1].split(')')[0] == 'C01' && id.slice(1, 2) == 'L0') {
         return <span>4700 x 4100</span>;
@@ -247,13 +267,13 @@ class Card extends Component {
           }
         })
         .catch(function(error) {
-          console.log(error);
-      });
+          // console.log(error);
+        });
     }
-    if(arrAll.includes(that.props.id)) {
-      return '破损'
-    }else {
-      return '正常'
+    if (arrAll.includes(that.props.id)) {
+      return '破损';
+    } else {
+      return '正常';
     }
   };
 
@@ -279,7 +299,7 @@ class Card extends Component {
         </div>
         <div className="infoline">
           <span>状态：</span>
-          <span>{this.statusRender()}</span>
+          <span>{this.state.currentlog && this.state.currentlog.state ? '破损' : '正常'}</span>
         </div>
         <div className="infoline">
           <span>钢化：</span>
@@ -308,7 +328,7 @@ class Card extends Component {
         </div>
         <div className="infoline">
           <span>面积：</span>
-          <spa>{this.areaRender()}</spa>
+          <span>{this.areaRender()}</span>
         </div>
         <div className="infoline">
           <span>位置：</span>
@@ -324,7 +344,7 @@ class Card extends Component {
               style={{ width: '70%', height: '70%' }}
             />
           ) : (
-            <Zmage src={require('@/assets/good.jpg')} style={{ width: '70%', height: '70%' }} />
+            <Zmage src={require('@/assets/good.jpg')} style={{ width: '60%', height: '60%' }} />
           )}
         </div>
         <div className="infoline">

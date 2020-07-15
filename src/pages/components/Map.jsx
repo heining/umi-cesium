@@ -94,7 +94,7 @@ class Map extends Component {
       if (Cesium.defined(pick)) {
         // 根据每块玻璃的ID区分
         const name = pick.getProperty('id');
-        console.log(name);
+        // console.log(name);
         if (name.includes('GF')) {
           selected.feature = pick;
           if (pick === highlighted.feature) {
@@ -140,7 +140,9 @@ class Map extends Component {
   };
 
   handleHideBuildings = () => {
-    this.model11.show = false;
+    if(this.model11) {
+      this.model11.show = false;
+    }
   };
 
   handleShowBuildings = () => {
@@ -211,7 +213,7 @@ class Map extends Component {
   };
 
   handleName = e => {
-    console.log(e.target.value);
+    // console.log(e.target.value);
     this.setState({
       nameValue: e.target.value,
     });
@@ -220,7 +222,7 @@ class Map extends Component {
     }
   };
   handlePass = e => {
-    console.log(e.target.value);
+    // console.log(e.target.value);
     this.setState({
       PassValue: e.target.value,
     });
@@ -366,6 +368,69 @@ class Map extends Component {
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
   }
 
+  selectGFColor = (target, floor) => {
+    const that = this;
+    let GFglass = [];
+    target.style = new Cesium.Cesium3DTileStyle({
+      // show: true,
+      color: {
+        evaluateColor: function(feature, result) {
+          const featureId = feature.getProperty('id');
+          if (
+            featureId.includes('GF') &&
+            Number(
+              featureId
+                .split('—')[1]
+                .split('F')[1]
+                .split('001')[0],
+            ) == floor
+          ) {
+            // GFglass.push(featureId);
+            // GFglass = Array.from(new Set(GFglass));
+            // that.setState({
+            //   GFglass,
+            // });
+            return Cesium.Color.clone(Cesium.Color.YELLOW, result);
+          } else {
+            return Cesium.Color.clone(Cesium.Color.WHITE, result);
+          }
+        },
+      },
+    });
+  };
+
+  // 设置选中同一层石材的颜色
+  selectWFColor = (target, floor) => {
+    const that = this;
+    let WFglass = [];
+    target.style = new Cesium.Cesium3DTileStyle({
+      // show: true,
+      color: {
+        evaluateColor: function(feature, result) {
+          const featureId = feature.getProperty('id');
+          if (
+            featureId.includes('WF') &&
+            Number(
+              featureId
+                .split('—')[1]
+                .split('F')[1]
+                .split('001')[0],
+            ) == floor
+          ) {
+            // WFglass.push(featureId);
+            // WFglass = Array.from(new Set(WFglass));
+            // that.setState({
+            //   WFglass,
+            // });
+            return Cesium.Color.clone(Cesium.Color.BLUE, result);
+          } else {
+            return Cesium.Color.clone(Cesium.Color.WHITE, result);
+          }
+        },
+      },
+    });
+  };
+
   render() {
     // const layout = {
     //   labelCol: {
@@ -460,6 +525,12 @@ class Map extends Component {
           handleShowBuildInfo={this.handleShowBuildInfo}
           handleShowInfo={this.handleShowInfo}
           jydsPosition={this.jydsPosition}
+          selectGFColor={e => {
+            this.selectGFColor(this.jyds, e);
+          }}
+          selectWFColor={e => {
+            this.selectWFColor(this.jyds, e);
+          }}
         />
         {/* 构件信息 */}
         {this.state.showDetail ? (

@@ -13,7 +13,7 @@ let times = [];
 
 class History extends Component {
   constructor(props) {
-    console.log(props);
+    // console.log(props);
     super(props);
     this.state = {
       showHistory: true,
@@ -23,7 +23,7 @@ class History extends Component {
   }
 
   componentDidMount() {
-    console.log(urls, this.state.urls);
+    // console.log(urls, this.state.urls);
     const that = this;
     // 数据库glass的ID换取log(历史记录)的ID
     const formData2 = new FormData();
@@ -35,7 +35,7 @@ class History extends Component {
       .then(function(response) {
         if (response.length > 0) {
           response.map((item, index) => {
-            console.log(item);
+            // console.log(item);
             const formData3 = new FormData();
             formData3.append('log_id', item.id);
             request
@@ -66,7 +66,7 @@ class History extends Component {
       });
   }
   componentWillUnmount = () => {
-    console.log('1');
+    // console.log('1');
     urls = [];
     time = '';
     logID = [];
