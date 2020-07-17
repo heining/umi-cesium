@@ -301,7 +301,7 @@ class Card extends Component {
           <span>状态：</span>
           <span>{this.state.currentlog && this.state.currentlog.state ? '破损' : '正常'}</span>
         </div>
-        <div className="infoline">
+        {/* <div className="infoline">
           <span>钢化：</span>
           <span>
             <Radio.Group
@@ -317,10 +317,11 @@ class Card extends Component {
               </Radio>
             </Radio.Group>
           </span>
-        </div>
+        </div> */}
         <div className="infoline">
           <span>配置：</span>
           <span>6mm-low-e+12A+6mm</span>
+          <span>钢化</span>
         </div>
         <div className="infoline">
           <span>尺寸：</span>

@@ -785,10 +785,12 @@ class Info extends Component {
       <div className="infobox">
         <div
           className="infoline"
-          style={{ marginBottom: 10, width: 150, fontSize: 18, fontWeight: 600, color: 'red' }}
+          style={{ marginBottom: 10, width: 150, fontSize: 22, fontWeight: 600 }}
         >
           交银金融大厦
         </div>
+        {/* 分割线 */}
+        <hr style/>
         {/* 楼宇信息 */}
         <div className="infoline">
           <a
@@ -825,7 +827,7 @@ class Info extends Component {
             }}
             onClick={this.props.handleShowInfo}
           >
-            构件信息
+            五金件信息
           </a>
         </div>
 
@@ -979,8 +981,8 @@ class Info extends Component {
             <Option value="0">幕墙面板问题</Option>
             <Option value="1">外露构件问题</Option>
             <Option value="2">承力构件、连接件、连接螺栓问题</Option>
-            <Option value="3">硅酮密封胶、胶条问题</Option>
-            <Option value="4">开启部分问题</Option>
+            <Option value="3">硅酮密封胶、密封胶条问题</Option>
+            <Option value="4">开启系统问题</Option>
             <Option value="5">幕墙排水系统问题</Option>
             <Option value="6">硅酮结构密封胶、粘接性能问题</Option>
           </Select>
@@ -1031,7 +1033,7 @@ class Info extends Component {
           <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
-              <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮密封胶、胶条问题</span>
+              <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮密封胶、密封胶条问题</span>
               <hr />
               <div>
                 <span style={{ marginLeft: 68 }}>主楼幕墙破损：{this.state.PodiumNum}块</span>
@@ -1075,7 +1077,7 @@ class Info extends Component {
           <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <span className="colorbox" style={{ backgroundColor: 'black' }}></span>
-              <span style={{ fontSize: 12, marginLeft: 10 }}>开启部分问题</span>
+              <span style={{ fontSize: 12, marginLeft: 10 }}>开启系统问题</span>
               <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num4}块</span>
               <span style={{ marginLeft: 20 }}>破损面积：{this.state.area4} </span>
             </div>
@@ -1155,7 +1157,7 @@ class Info extends Component {
             <div className="colorline" style={{ justifyContent: 'flex-start' }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
-                <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮密封胶、胶条问题</span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮密封胶、密封胶条问题</span>
                 <hr />
                 <div>
                   <span style={{ marginLeft: 76 }}>主楼幕墙破损：{this.state.PodiumNum}块</span>
@@ -1169,7 +1171,7 @@ class Info extends Component {
             <div className="colorline" style={{ justifyContent: 'flex-start' }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span className="colorbox" style={{ backgroundColor: 'black' }}></span>
-                <span style={{ fontSize: 12, marginLeft: 10 }}>开启部分问题</span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>开启系统问题</span>
                 <span style={{ marginLeft: 125 }}>幕墙破损：{this.state.num4}块</span>
                 <span style={{ marginLeft: 10 }}>破损面积：{this.state.area4} </span>
               </div>
