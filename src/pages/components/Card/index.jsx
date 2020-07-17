@@ -321,6 +321,7 @@ class Card extends Component {
         <div className="infoline">
           <span>配置：</span>
           <span>6mm-low-e+12A+6mm</span>
+          <br />
           <span>钢化</span>
         </div>
         <div className="infoline">

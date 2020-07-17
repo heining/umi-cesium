@@ -77,7 +77,7 @@ class Info extends Component {
   }
 
   handleStyleChange = e => {
-    // console.log(e);
+    console.log(e);
     // 玻璃集合
     let arrs = this.props.arrs;
     // 石材集合
@@ -156,18 +156,22 @@ class Info extends Component {
     // this.props.viewer.flyTo(this.props.jyds);
   };
 
-  handleWFChange = e => {
-    // console.log(e);
-    // this.selectWFColor(this.props.jyds, e);
-    this.props.selectWFColor(e);
-  };
+  // handleWFChange = e => {
+  //   // console.log(e);
+  //   // this.selectWFColor(this.props.jyds, e);
+  //   this.props.selectWFColor(e);
+  // };
 
-  handleGFChange = e => {
-    // console.log(e);
+  handleFChange = e => {
+    console.log(e);
     // this.setState({
     //   GFf: e,
     // });
-    this.props.selectGFColor(e);
+    if (this.state.style == 'GF') {
+      this.props.selectGFColor(e);
+    } else {
+      this.props.selectWFColor(e);
+    }
   };
 
   // 玻璃改变
@@ -600,34 +604,23 @@ class Info extends Component {
     // console.log(that.state.num, that.state.area);
   };
 
-  // 立面信息
-  flyTo = (lon, lat, hight, heading) => {
-    this.props.viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(lon, lat, hight), // 设置位置
-      orientation: {
-        heading: Cesium.Math.toRadians(heading), // 方向
-        pitch: Cesium.Math.toRadians(0), // 倾斜角度
-        roll: 0,
-      },
-      maximumHeight: 120,
-      // flyOverLongitude: Cesium.Math.toRadians(1.0),
-      duration: 3, // 设置飞行持续时间，默认会根据距离来计算
-    });
-  };
-
   handleEast = () => {
-    this.flyTo(121.502592, 31.2443895, 120.0, -140);
+    this.props.handleHideBuildings();
+    this.props.flyTo(121.502592, 31.2443895, 120.0, -140);
   };
 
   handleSouth = () => {
-    this.flyTo(121.503292, 31.2385895, 120.0, -50);
+    this.props.handleHideBuildings();
+    this.props.flyTo(121.503292, 31.2385895, 120.0, -50);
   };
 
   handleWest = () => {
-    this.flyTo(121.496292, 31.2378895, 120.0, 40);
+    this.props.handleHideBuildings();
+    this.props.flyTo(121.496292, 31.2378895, 120.0, 40);
   };
 
   handleNorth = () => {
+    this.props.handleHideBuildings();
     this.flyTo(121.495592, 31.2439895, 120.0, 130);
   };
 
@@ -716,7 +709,7 @@ class Info extends Component {
   // 隐藏总检查结果
   handlehideResult = () => {
     const that = this;
-    that.setState({  
+    that.setState({
       btn: false,
     });
     // 选中效果
@@ -780,6 +773,23 @@ class Info extends Component {
     });
   }
 
+  floorRender() {
+    if (this.state.style == 'GF') {
+      GFfloor.map((item, index) => {
+        console.log(item)
+        return (<Option value={item} key={index}>
+          {item}
+        </Option>)
+      });
+    } else {
+      WFfloor.map((item, index) => {
+        return (<Option value={item} key={index}>
+          {item}
+        </Option>)
+      });
+    }
+  }
+
   render() {
     return (
       <div className="infobox">
@@ -790,7 +800,7 @@ class Info extends Component {
           交银金融大厦
         </div>
         {/* 分割线 */}
-        <hr style/>
+        <hr style={{ noshade: 'noshade', color: '#bfbfbf' }} />
         {/* 楼宇信息 */}
         <div className="infoline">
           <a
@@ -885,10 +895,10 @@ class Info extends Component {
         </div>
 
         <div style={{ marginTop: 15 }}>
-          <label style={{ float: 'left', marginRight: 5 }}>幕墙位置</label>
+          <label style={{ float: 'left', marginRight: 5 }}>材质类型</label>
           <Select
             placeholder={'请选择分类'}
-            style={{ width: 100, marginRight: 20, float: 'left', background: 'transparent ' }}
+            style={{ width: 100, marginRight: 5, float: 'left', background: 'transparent ' }}
             onChange={this.handleStyleChange}
           >
             <Option value="GF" key={1}>
@@ -898,72 +908,24 @@ class Info extends Component {
               石材
             </Option>
           </Select>
-          {this.state.style == 'GF' ? (
-            // <>
-            <Select
-              placeholder={'请选择楼层'}
-              style={{ width: 100, marginRight: 20, float: 'left' }}
-              onChange={this.handleGFChange}
-            >
-              {GFfloor.map((item, index) => (
-                <Option value={item} key={index}>
-                  {item}
-                </Option>
-              ))}
-            </Select>
-          ) : (
-            //   <Select
-            //     placeholder={'请选择幕墙'}
-            //     style={{ width: 200, marginRight: 20, float: 'left' }}
-            //     onChange={this.handleGlassChange}
-            //   >
-            //     {this.state.GFglass.map((item, index) => (
-            //       <Option value={item} key={index}>
-            //         {item}
-            //       </Option>
-            //     ))}
-            //   </Select>
-            // </>
-            <div style={{ float: 'left' }}></div>
-          )}
-          {this.state.style == 'WF' ? (
-            // <>
-            <Select
-              placeholder={'请选择楼层'}
-              style={{ width: 100, marginRight: 20, float: 'left' }}
-              onChange={this.handleWFChange}
-            >
-              {WFfloor.map((item, index) => (
-                <Option value={item} key={index}>
-                  {item}
-                </Option>
-              ))}
-            </Select>
-          ) : (
-            //   <Select
-            //     placeholder={'请选择幕墙'}
-            //     style={{ width: 200, marginRight: 20, float: 'left' }}
-            //     onChange={this.handleGlassChange}
-            //   >
-            //     {this.state.WFglass.map((item, index) => (
-            //       <Option value={item} key={index}>
-            //         {item}
-            //       </Option>
-            //     ))}
-            //   </Select>
-            // </>
-            <div></div>
-          )}
-          <br />
+          <label style={{ float: 'left', marginRight: 5 }}>楼层</label>
+          <Select
+            placeholder={'请选择楼层'}
+            style={{ width: 100, marginRight: 20, float: 'left' }}
+            onChange={this.handleFChange}
+          >
+            {this.floorRender()}  
+          </Select>
+          <label style={{ float: 'left', marginRight: 5}}>编号</label>
           <Input
-            style={{ width: 250, marginTop: 30, display: 'block' }}
+            style={{ width: 150 , display: 'block', float: 'left' }}
             placeholder="请输入幕墙编号"
             allowClear
             onChange={this.handleChange}
             onPressEnter={this.handleEnter}
           />
           <div style={{ color: 'green', fontSize: 12, textAlign: 'left' }}>
-            请按照当前格式输入：L2N072-(C74)GF013
+            请按照当前格式输入：L2WN072-(C74)GF013
           </div>
           <div style={{ color: 'green', fontSize: 12, textAlign: 'left' }}>
             其中L2:幕墙中的小层, N072: 每块幕墙的序列号, C74: 幕墙类型, GF013: 幕墙楼层
@@ -1112,7 +1074,7 @@ class Info extends Component {
           <div></div>
         )}
 
-        <div style={{ textAlign: 'left', marginTop: 10 }}>
+        {/* <div style={{ textAlign: 'left', marginTop: 10 }}>
           <span style={{ marginLeft: 10, marginRight: 10 }}>幕墙总检查结果</span>
           <Button ghost onClick={this.handleshowResult} style={{ marginTop: 10, marginRight: 10 }}>
             显示
@@ -1202,8 +1164,8 @@ class Info extends Component {
         ) : (
           <div></div>
         )}
-      </div>
-      // </div>
+      </div> */}
+     </div>
     );
   }
 }

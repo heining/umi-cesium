@@ -4,6 +4,7 @@ import Info from './Info/index';
 import GlassInfo from './Info/GlassInfo';
 import BuildInfo from './Info/BuildInfo';
 import MemberInfo from './Info/MemberInfo';
+import CheckTable from './Info/CheckTable';
 // import DetailInfo from './Info/DetailInfo';
 import { Input, Button, message } from 'antd';
 import Card from './Card/index';
@@ -140,9 +141,26 @@ class Map extends Component {
   };
 
   handleHideBuildings = () => {
-    if(this.model11) {
+    if (this.model11) {
       this.model11.show = false;
     }
+    // 跳转到交银大厦的最佳视图
+    this.jydsPosition();
+  };
+
+  // 立面信息
+  flyTo = (lon, lat, hight, heading) => {
+    this.viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(lon, lat, hight), // 设置位置
+      orientation: {
+        heading: Cesium.Math.toRadians(heading), // 方向
+        pitch: Cesium.Math.toRadians(0), // 倾斜角度
+        roll: 0,
+      },
+      maximumHeight: 120,
+      // flyOverLongitude: Cesium.Math.toRadians(1.0),
+      duration: 3, // 设置飞行持续时间，默认会根据距离来计算
+    });
   };
 
   handleShowBuildings = () => {
@@ -164,6 +182,7 @@ class Map extends Component {
           console.log(error);
         });
     }
+    this.flyTo(121.486521, 31.243209, 120.0, 100);
   };
 
   // 幕墙信息
@@ -525,6 +544,7 @@ class Map extends Component {
           handleShowBuildInfo={this.handleShowBuildInfo}
           handleShowInfo={this.handleShowInfo}
           jydsPosition={this.jydsPosition}
+          flyTo={this.flyTo}
           selectGFColor={e => {
             this.selectGFColor(this.jyds, e);
           }}
@@ -571,6 +591,9 @@ class Map extends Component {
         ) : (
           <div></div>
         )}
+        {/* 表单面板 */}
+        <CheckTable/>
+
         {/* 幕墙详细信息 */}
         {/* {this.state.showDetailInfo ? (
             <DetailInfo handleHideDetailInfo={this.handleHideDetailInfo} />
