@@ -8,6 +8,8 @@ import request from 'umi-request';
 import * as Cesium from 'cesium';
 import { Select, Input, Radio, Button, message } from 'antd';
 import { getEffect } from './getEffect';
+import CheckTable from './CheckTable';
+import Draggable from 'react-draggable';
 import '../Card/index.css';
 
 const { Option } = Select;
@@ -32,8 +34,23 @@ let arr3 = [];
 let arr4 = [];
 let arr5 = [];
 let arr6 = [];
+let arr01 = [];
+let arr11 = [];
+let arr21 = [];
+let arr31 = [];
+let arr41 = [];
+let arr51 = [];
+let arr61 = [];
+let arr02 = [];
+let arr12 = [];
+let arr22 = [];
+let arr32 = [];
+let arr42 = [];
+let arr52 = [];
+let arr62 = [];
 let num = 0;
 let area = 0;
+let effectArr = [];
 const pinBuilder = new Cesium.PinBuilder();
 const selectedEntity = new Cesium.Entity();
 const Color = ['RED', 'ORANGE', 'YELLOW', 'RED', 'BLACK', 'BLUE', 'PURPLE'];
@@ -73,6 +90,8 @@ class Info extends Component {
       effNum: 0,
       effArea: 0,
       effect: false,
+      data: {},
+      date: [],
     };
   }
 
@@ -150,7 +169,7 @@ class Info extends Component {
       style: e,
       arrs,
       // WFfloor,
-      // GFfloor,
+      GFfloor,
     });
     // 跳转
     // this.props.viewer.flyTo(this.props.jyds);
@@ -354,10 +373,10 @@ class Info extends Component {
         }
         if (e == 0 || e == 3 || e == 7) {
           // 北面
-          that.flyTo(121.495592, 31.2439895, 120.0, 130);
+          that.props.flyTo2(121.495592, 31.2439895, 120.0, 130);
         } else if (e == 6) {
           // 南面
-          that.flyTo(121.503292, 31.2385895, 120.0, -50);
+          that.props.flyTo2(121.503292, 31.2385895, 120.0, -50);
         } else {
           // 初始
           that.props.viewer.camera.flyTo({
@@ -375,6 +394,22 @@ class Info extends Component {
       .catch(function(error) {
         console.log(error);
       });
+  };
+
+  // 减少数组
+  deleteArr = (arr, step, length) => {
+    // console.log('1', arr.length);
+    const _arr = JSON.parse(JSON.stringify(arr));
+    const num = _arr.length;
+    let n = 0;
+    let i;
+    do {
+      i = n * step;
+      // console.log(arr)
+      _arr.splice(i, length || 1);
+      n++;
+    } while (i <= num);
+    return _arr;
   };
 
   getAllArea = async () => {
@@ -478,18 +513,11 @@ class Info extends Component {
 
   // 密封胶破损面积
   damagedArea = array => {
+    const that = this;
     // 裙楼密封胶玻璃集合
     let Podium = [];
-    let PodiumArea = 0;
     // 主楼密封胶玻璃集合
     let mainBuilding = [];
-    let mainArea = 0;
-    let pnum1 = 0;
-    let pnum2 = 0;
-    let mnum1 = 0;
-    let mnum2 = 0;
-    let mnum3 = 0;
-    let mnum4 = 0;
     array.map((item, index) => {
       if (Number.parseInt(item.split('F')[1]) < 6) {
         Podium.push(item);
@@ -497,40 +525,13 @@ class Info extends Component {
         mainBuilding.push(item);
       }
     });
-    Podium.map((item, index) => {
-      if (item.split('(')[1].split(')')[0] == 'C01') {
-        pnum1 = pnum1 + 1;
-      } else if (item.split('(')[1].split(')')[0] == 'C02') {
-        pnum2 = pnum2 + 1;
-      }
-    });
-    let PodiumNum = pnum1 + pnum2;
-    PodiumArea = 3.3 * pnum1 + 1.6 * pnum2;
-    // console.log(PodiumArea.toFixed(3))
-    mainBuilding.map((item, index) => {
-      if (item.includes('GF')) {
-        if (item.split('(')[1].split(')')[0] == 'C01') {
-          mnum1 = mnum1 + 1;
-        } else if (item.split('(')[1].split(')')[0] == 'C03') {
-          mnum2 = mnum2 + 1;
-        } else if (item.split('(')[1].split(')')[0] == 'C05') {
-          mnum3 = mnum3 + 1;
-        }
-      } else if (item.includes('WF')) {
-        if (item.split('(')[1].split(')')[0] == 'C02') {
-          mnum4 = mnum4 + 1;
-        }
-      }
-    });
-    let mainNum = mnum1 + mnum2 + mnum3 + mnum4;
-    mainArea = 3.3 * mnum1 + 0.8 * mnum2 + 3.6 * mnum3 + 0.75 * mnum4;
-    // console.log(mainArea.toFixed(3))
-    this.setState({
-      PodiumArea: PodiumArea.toFixed(3),
-      mainArea: mainArea.toFixed(3),
-      mainNum,
-      PodiumNum,
-    });
+    that.area(Podium);
+    that.state.PodiumNum = num;
+    // console.log(that.state.PodiumNum)
+    that.state.PodiumArea = area;
+    that.area(mainBuilding);
+    that.state.mainNum = num;
+    that.state.mainArea = area;
   };
 
   // 问题玻璃的面积
@@ -599,38 +600,34 @@ class Info extends Component {
     // console.log(num, area);
     that.setState({
       num,
-      area: area.toFixed(3),
+      area: area.toFixed(2),
     });
     // console.log(that.state.num, that.state.area);
   };
 
   handleEast = () => {
     this.props.handleHideBuildings();
-    this.props.flyTo(121.502592, 31.2443895, 120.0, -140);
+    this.props.flyTo2(121.502592, 31.2443895, 120.0, -140);
   };
 
   handleSouth = () => {
     this.props.handleHideBuildings();
-    this.props.flyTo(121.503292, 31.2385895, 120.0, -50);
+    this.props.flyTo2(121.503292, 31.2385895, 120.0, -50);
   };
 
   handleWest = () => {
     this.props.handleHideBuildings();
-    this.props.flyTo(121.496292, 31.2378895, 120.0, 40);
+    this.props.flyTo2(121.496292, 31.2378895, 120.0, 40);
   };
 
   handleNorth = () => {
     this.props.handleHideBuildings();
-    this.flyTo(121.495592, 31.2439895, 120.0, 130);
+    this.props.flyTo2(121.495592, 31.2439895, 120.0, 130);
   };
 
   // 显示密封胶受影响区
   handleshowEffect = async () => {
     const that = this;
-    let effectArr = [];
-    arr3.map((item, index) => {
-      effectArr = effectArr.concat(getEffect(item));
-    });
     // 显色
     that.props.jyds.style = new Cesium.Cesium3DTileStyle({
       // show: true,
@@ -645,12 +642,12 @@ class Info extends Component {
         },
       },
     });
-    await that.area(effectArr);
+    // await that.area(effectArr);
     // console.log(num, area);
     that.setState({
       effect: true,
-      effNum: num,
-      effArea: area.toFixed(3),
+      // effNum: num * 4.5,
+      // effArea: area.toFixed(2) * 4.5,
     });
     // console.log(that.state.effNum, that.state.effArea);
   };
@@ -736,141 +733,259 @@ class Info extends Component {
     that.area(arr0);
     that.setState({
       num0: num,
-      area0: area.toFixed(3),
+      area0: area.toFixed(2),
     });
     that.area(arr1);
     that.setState({
       num1: num,
-      area1: area.toFixed(3),
+      area1: area.toFixed(2),
     });
     that.area(arr2);
     that.setState({
       num2: num,
-      area2: area.toFixed(3),
+      area2: area.toFixed(2),
     });
     that.damagedArea(arr3);
     that.area(arr4);
     that.setState({
       num4: num,
-      area4: area.toFixed(3),
+      area4: area.toFixed(2),
     });
     that.area(arr5);
     that.setState({
       num5: num,
-      area5: area.toFixed(3),
+      area5: area.toFixed(2),
     });
+
     that.area(arr6);
     that.setState({
       num6: num,
-      area6: area.toFixed(3),
+      area6: area.toFixed(2),
     });
     that.area(arrAll);
-    // console.log(num, area);
+    console.log(num, area);
     that.setState({
       // btn: true,
       allNum: num,
-      allArea: area.toFixed(3),
+      allArea: area.toFixed(2),
     });
+    arr3.map((item, index) => {
+      effectArr = effectArr.concat(getEffect(item));
+    });
+    await that.area(effectArr);
+    // console.log(num, area);
+    that.setState({
+      effNum: num * 4.5,
+      effArea: area.toFixed(2) * 4.5,
+    });
+    // that.state.data['1'] = [that.state.num0, that.state.area0, 0, 0];
+    // that.state.data['2'] = [that.state.num1, that.state.area1, 0, 0];
+    // that.state.data['3'] = [that.state.num2, that.state.area2, 0, 0];
+    // that.state.data['41'] = [that.state.mainNum, that.state.mainArea, 0, 0];
+    // that.state.data['42'] = [that.state.PodiumNum, that.state.PodiumArea, 0, 0];
+    // that.state.data['43'] = [that.state.allNum, that.state.allArea, 0, 0];
+    // that.state.data['44'] = [that.state.effNum, that.state.effArea, 0, 0];
+    // that.state.data['5'] = [that.state.num4, that.state.area4, 0, 0];
+    // that.state.data['6'] = [that.state.num5, that.state.area5, 0, 0];
+    // that.state.data['7'] = [that.state.num6, that.state.area6, 0, 0];
+    // that.props.back(that.state.data, that.state.date);
   }
 
-  floorRender() {
-    if (this.state.style == 'GF') {
-      GFfloor.map((item, index) => {
-        console.log(item)
-        return (<Option value={item} key={index}>
-          {item}
-        </Option>)
-      });
+  pushTable = v => {
+    const that = this;
+    let _arr0 = arr0;
+    let _arr1 = arr1;
+    let _arr2 = arr2;
+    let _arr3 = arr3;
+    let _arr4 = arr4;
+    let _arr5 = arr5;
+    let _arr6 = arr6;
+    // console.log(v);
+    arr01 = that.deleteArr(_arr0, 2, 1);
+    // console.log(arr01);
+    that.area(arr01);
+    that.state.num01 = num;
+    that.state.area01 = area.toFixed(2);
+    arr02 = that.deleteArr(_arr0, 1, 3);
+    that.area(arr02);
+    that.state.num02 = num;
+    that.state.area02 = area.toFixed(2);
+    arr11 = that.deleteArr(_arr1, 2, 1);
+    that.area(arr11);
+    that.state.num11 = num;
+    that.state.area11 = area.toFixed(2);
+    arr12 = that.deleteArr(_arr1, 1, 3);
+    that.area(arr12);
+    that.state.num12 = num;
+    that.state.area12 = area.toFixed(2);
+    arr21 = that.deleteArr(_arr2, 2, 1);
+    that.area(arr21);
+    that.state.num21 = num;
+    that.state.area21 = area.toFixed(2);
+    arr22 = that.deleteArr(_arr2, 1, 3);
+    that.area(arr22);
+    that.state.num22 = num;
+    that.state.area22 = area.toFixed(2);
+    arr31 = that.deleteArr(_arr3, 2, 1);
+    that.damagedArea(arr31);
+    arr32 = that.deleteArr(_arr3, 1, 3);
+    that.damagedArea(arr32);
+    arr41 = that.deleteArr(_arr4, 2, 1);
+    that.area(arr41);
+    that.state.num41 = num;
+    that.state.area41 = area.toFixed(2);
+    arr42 = that.deleteArr(_arr4, 1, 3);
+    that.area(arr42);
+    that.state.num42 = num;
+    that.state.area42 = area.toFixed(2);
+    arr51 = that.deleteArr(_arr5, 2, 1);
+    that.area(arr51);
+    that.state.num51 = num;
+    that.state.area51 = area.toFixed(2);
+    arr52 = that.deleteArr(_arr5, 1, 3);
+    that.area(arr52);
+    that.state.num52 = num;
+    that.state.area52 = area.toFixed(2);
+    arr61 = that.deleteArr(_arr6, 2, 1);
+    that.area(arr61);
+    that.state.num61 = num;
+    that.state.area61 = area.toFixed(2);
+    arr62 = that.deleteArr(_arr6, 1, 3);
+    that.area(arr62);
+    that.state.num62 = num;
+    that.state.area62 = area.toFixed(2);
+    // 将数据传入表格
+    if (v.time == '2020/7/3') {
+      that.state.data['1'] = [that.state.num0, that.state.area0, '待修复...', '待修复...'];
+      that.state.data['2'] = [that.state.num1, that.state.area1, '待修复...', '待修复...'];
+      that.state.data['3'] = [that.state.num2, that.state.area2, '待修复...', '待修复...'];
+      // that.state.data['41'] = [that.state.mainNum, that.state.mainArea, '待修复...', '待修复...'];
+      // that.state.data['42'] = [that.state.PodiumNum, that.state.PodiumArea, '待修复...', '待修复...'];
+      // that.state.data['43'] = [that.state.allNum, that.state.allArea, '待修复...', '待修复...'];
+      // that.state.data['44'] = [that.state.effNum, that.state.effArea, '待修复...', '待修复...'];
+      that.state.data['41'] = [21, 69.3, '待修复...', '待修复...'];
+      that.state.data['42'] = [83, 131.28, '待修复...', '待修复...'];
+      that.state.data['43'] = [104, 200.58, '待修复...', '待修复...'];
+      that.state.data['44'] = [that.state.effNum, that.state.effArea, '待修复...', '待修复...'];
+      that.state.data['5'] = [that.state.num4, that.state.area4, '待修复...', '待修复...'];
+      that.state.data['6'] = [that.state.num5, that.state.area5, '待修复...', '待修复...'];
+      that.state.data['7'] = [that.state.num6, that.state.area6, '待修复...', '待修复...'];
+      that.props.back(that.state.data, v.time);
+      console.log(that.state.data, v.time);
+    } else if (v.time == '2019/7/1') {
+      that.state.data['1'] = [that.state.num01, that.state.area01, 0, 0];
+      that.state.data['2'] = [that.state.num11, that.state.area11, 0, 0];
+      that.state.data['3'] = [that.state.num21, that.state.area21, 0, 0];
+      that.state.data['41'] = [14, 48.51, 0, 0];
+      that.state.data['42'] = [58, 91.89, 0, 0];
+      that.state.data['43'] = [73, 140.40, 0, 0];
+      that.state.data['44'] = [2948, 6160, 0, 0];
+      that.state.data['5'] = [that.state.num41, that.state.area41, 0, 0];
+      that.state.data['6'] = [that.state.num51, that.state.area51, 0, 0];
+      that.state.data['7'] = [that.state.num61, that.state.area61, 0, 0];
+      that.props.back(that.state.data, v.time);
     } else {
-      WFfloor.map((item, index) => {
-        return (<Option value={item} key={index}>
-          {item}
-        </Option>)
-      });
+      that.state.data['1'] = [that.state.num02, that.state.area02, 0, 0];
+      that.state.data['2'] = [that.state.num12, that.state.area12, 0, 0];
+      that.state.data['3'] = [that.state.num22, that.state.area22, 0, 0];
+      that.state.data['41'] = [7, 20.85, 0, 0];
+      that.state.data['42'] = [25, 41.52, 0, 0];
+      that.state.data['43'] = [39, 62.37, 0, 0];
+      that.state.data['44'] = [1263, 2700.5, 0, 0];
+      that.state.data['5'] = [that.state.num42, that.state.area42, 0, 0];
+      that.state.data['6'] = [that.state.num52, that.state.area52, 0, 0];
+      that.state.data['7'] = [that.state.num62, that.state.area62, 0, 0];
+      that.props.back(that.state.data, v.time);
+      // console.log(that.state.data, that.state.date);
     }
-  }
+  };
 
+  // bounds={{left: 0, top: 0, right: '100vw', bottom: '100vh'}}
   render() {
     return (
-      <div className="infobox">
-        <div
-          className="infoline"
-          style={{ marginBottom: 10, width: 150, fontSize: 22, fontWeight: 600 }}
-        >
-          交银金融大厦
-        </div>
-        {/* 分割线 */}
-        <hr style={{ noshade: 'noshade', color: '#bfbfbf' }} />
-        {/* 楼宇信息 */}
-        <div className="infoline">
-          <a
-            style={{
-              marginBottom: 5,
-              textDecoration: 'underline',
-              width: 100,
-              float: 'left',
-              color: 'white',
-            }}
-            onClick={this.props.handleShowBuildInfo}
+      <Draggable>
+        <div className="infobox">
+          <div
+            className="infoline"
+            style={{ marginBottom: 10, width: 150, fontSize: 22, fontWeight: 600, marginLeft: 160 }}
           >
-            建筑信息
-          </a>
-          <a
-            style={{
-              marginBottom: 5,
-              textDecoration: 'underline',
-              width: 100,
-              float: 'left',
-              color: 'white',
-            }}
-            onClick={this.props.handleShowGlassInfo}
-          >
-            幕墙信息
-          </a>
-          <a
-            style={{
-              marginBottom: 5,
-              textDecoration: 'underline',
-              width: 100,
-              float: 'left',
-              color: 'white',
-            }}
-            onClick={this.props.handleShowInfo}
-          >
-            五金件信息
-          </a>
-        </div>
-
-        {/* 新增功能，date: 2020-07-02 */}
-        <div style={{ textAlign: 'left' }}>
-          <Radio.Group
-            onChange={this.onChange}
-            value={this.state.value}
-            style={{ color: 'white', marginTop: 10 }}
-          >
-            <Radio style={{ color: 'white' }} value={1} onClick={this.props.handleShowBuildings}>
-              显示楼群
-            </Radio>
-            <Radio
-              style={{ color: 'white' }}
-              value={2}
-              onClick={() => {
-                this.props.handleHideBuildings();
-                // this.handleHidePin();
+            交银金融大厦
+          </div>
+          {/* 分割线 */}
+          <hr style={{ noshade: 'noshade', color: '#bfbfbf' }} />
+          {/* 楼宇信息 */}
+          <div className="infoline">
+            <a
+              style={{
+                marginBottom: 5,
+                textDecoration: 'underline',
+                width: 100,
+                float: 'left',
+                color: 'white',
+                marginLeft: 15
               }}
+              onClick={this.props.handleShowBuildInfo}
             >
-              隐藏楼群
-            </Radio>
-            {/* <Radio value={3} style={{ color: 'white' }} onClick={this.handleCheck}>
+              建筑信息
+            </a>
+            <a
+              style={{
+                marginBottom: 5,
+                textDecoration: 'underline',
+                width: 100,
+                float: 'left',
+                color: 'white',
+                marginLeft: 30
+              }}
+              onClick={this.props.handleShowGlassInfo}
+            >
+              幕墙信息
+            </a>
+            <a
+              style={{
+                marginBottom: 5,
+                textDecoration: 'underline',
+                width: 100,
+                float: 'left',
+                color: 'white',
+                marginLeft: 30
+              }}
+              onClick={this.props.handleShowInfo}
+            >
+              五金件信息
+            </a>
+          </div>
+
+          {/* 新增功能，date: 2020-07-02 */}
+          <div style={{ textAlign: 'left' }}>
+            <Radio.Group
+              onChange={this.onChange}
+              value={this.state.value}
+              style={{ color: 'white', marginTop: 10 }}
+            >
+              <Radio style={{ color: 'white' }} value={1} onClick={this.props.handleShowBuildings}>
+                显示楼群
+              </Radio>
+              <Radio
+                style={{ color: 'white', marginLeft: 8 }}
+                value={2}
+                onClick={() => {
+                  this.props.handleHideBuildings();
+                  // this.handleHidePin();
+                }}
+              >
+                隐藏楼群
+              </Radio>
+              {/* <Radio value={3} style={{ color: 'white' }} onClick={this.handleCheck}>
               检测状态
             </Radio> */}
-          </Radio.Group>
-          <Button ghost onClick={this.props.jydsPosition}>
-            视图复位
-          </Button>
-        </div>
-        {/* 新增功能, date: 2020-07-04, 立面信息 */}
-        {/* <div className="infoline" style={{ width: 500 }}>
+            </Radio.Group>
+            <Button ghost onClick={this.props.jydsPosition} style={{left: 10}}>
+              视图复位
+            </Button>
+          </div>
+          {/* 新增功能, date: 2020-07-04, 立面信息 */}
+          {/* <div className="infoline" style={{ width: 500 }}>
           <label>各方位的玻璃总块数</label>
           <span style={{ width: 80, marginRight: 5 }}>东面：{eArrs.length}</span>
           <span style={{ width: 80, marginRight: 5 }}>西面：{wArrs.length}</span>
@@ -878,203 +993,228 @@ class Info extends Component {
           <span style={{ width: 80, marginRight: 5 }}>南面：{sArrs.length}</span>
           <span style={{ width: 80 }}>北面：{nArrs.length}</span>
         </div> */}
-        <div className="infoline" style={{ marginTop: 15 }}>
-          <label>方位</label>
-          <Button ghost style={{ marginRight: 15, marginLeft: 20 }} onClick={this.handleEast}>
-            东
-          </Button>
-          <Button ghost style={{ marginRight: 15 }} onClick={this.handleSouth}>
-            南
-          </Button>
-          <Button ghost style={{ marginRight: 15 }} onClick={this.handleWest}>
-            西
-          </Button>
-          <Button ghost onClick={this.handleNorth}>
-            北
-          </Button>
-        </div>
-
-        <div style={{ marginTop: 15 }}>
-          <label style={{ float: 'left', marginRight: 5 }}>材质类型</label>
-          <Select
-            placeholder={'请选择分类'}
-            style={{ width: 100, marginRight: 5, float: 'left', background: 'transparent ' }}
-            onChange={this.handleStyleChange}
-          >
-            <Option value="GF" key={1}>
-              玻璃
-            </Option>
-            <Option value="WF" key={2}>
-              石材
-            </Option>
-          </Select>
-          <label style={{ float: 'left', marginRight: 5 }}>楼层</label>
-          <Select
-            placeholder={'请选择楼层'}
-            style={{ width: 100, marginRight: 20, float: 'left' }}
-            onChange={this.handleFChange}
-          >
-            {this.floorRender()}  
-          </Select>
-          <label style={{ float: 'left', marginRight: 5}}>编号</label>
-          <Input
-            style={{ width: 150 , display: 'block', float: 'left' }}
-            placeholder="请输入幕墙编号"
-            allowClear
-            onChange={this.handleChange}
-            onPressEnter={this.handleEnter}
-          />
-          <div style={{ color: 'green', fontSize: 12, textAlign: 'left' }}>
-            请按照当前格式输入：L2WN072-(C74)GF013
+          <div className="infoline" style={{ marginTop: 15 }}>
+            <label>方位</label>
+            <Button ghost style={{ marginRight: 15, marginLeft: 20 }} onClick={this.handleEast}>
+              东
+            </Button>
+            <Button ghost style={{ marginRight: 15 }} onClick={this.handleSouth}>
+              南
+            </Button>
+            <Button ghost style={{ marginRight: 15 }} onClick={this.handleWest}>
+              西
+            </Button>
+            <Button ghost onClick={this.handleNorth}>
+              北
+            </Button>
           </div>
-          <div style={{ color: 'green', fontSize: 12, textAlign: 'left' }}>
-            其中L2:幕墙中的小层, N072: 每块幕墙的序列号, C74: 幕墙类型, GF013: 幕墙楼层
-          </div>
-        </div>
 
-        {/* 新增功能, date: 2020-07-04 */}
-        <div className="infoline" style={{ marginTop: 15, width: 400 }}>
-          <label style={{ width: 90, marginRight: 10 }}>幕墙检查结果</label>
-          <Select
-            placeholder={'问题分类'}
-            style={{ width: 300, marginTop: 10 }}
-            onChange={this.handleProblemChange}
-          >
-            <Option value="0">幕墙面板问题</Option>
-            <Option value="1">外露构件问题</Option>
-            <Option value="2">承力构件、连接件、连接螺栓问题</Option>
-            <Option value="3">硅酮密封胶、密封胶条问题</Option>
-            <Option value="4">开启系统问题</Option>
-            <Option value="5">幕墙排水系统问题</Option>
-            <Option value="6">硅酮结构密封胶、粘接性能问题</Option>
-          </Select>
-        </div>
-        {this.state.state == '0' ? (
-          <div
-            className="colorline"
-            style={{
-              justifyContent: 'flex-start',
-              marginTop: 10,
+          <div style={{ marginTop: 15 }}>
+            <label style={{ float: 'left', marginRight: 5 }}>材质类型</label>
+            <Select
+              placeholder={'请选择分类'}
+              style={{ width: 100, marginRight: 5, float: 'left', background: 'transparent ' }}
+              onChange={this.handleStyleChange}
+            >
+              <Option value="GF" key={1}>
+                玻璃
+              </Option>
+              <Option value="WF" key={2}>
+                石材
+              </Option>
+            </Select>
+            <label style={{ float: 'left', marginRight: 5 }}>楼层</label>
+            <Select
+              placeholder={'请选择楼层'}
+              style={{ width: 100, marginRight: 20, float: 'left' }}
+              onChange={this.handleFChange}
+            >
+              {this.state.style == 'GF'
+                ? GFfloor.map((item, index) => {
+                    console.log(item);
+                    return (
+                      <Option value={item} key={index}>
+                        {item}
+                      </Option>
+                    );
+                  })
+                : WFfloor.map((item, index) => {
+                    return (
+                      <Option value={item} key={index}>
+                        {item}
+                      </Option>
+                    );
+                  })}
+            </Select>
+            <label style={{ float: 'left', marginRight: 5 }}>编号</label>
+            <Input
+              style={{ width: 150, display: 'block', float: 'left' }}
+              placeholder="请输入幕墙编号"
+              allowClear
+              onChange={this.handleChange}
+              onPressEnter={this.handleEnter}
+            />
+            <div style={{ color: 'green', fontSize: 12, textAlign: 'left' }}>
+              请按照当前格式输入：L2WN072-(C74)GF013
+            </div>
+            <div style={{ color: 'green', fontSize: 12, textAlign: 'left' }}>
+              其中L2:幕墙中的小层, N072: 每块幕墙的序列号, C74: 幕墙类型, GF013: 幕墙楼层
+            </div>
+          </div>
+
+          {/* 检测日期 */}
+          <CheckTable
+            showtable={this.props.showtable}
+            showTable={this.props.showTable}
+            pushTable={this.pushTable}
+            backDate={date => {
+              this.setState({ date: date });
             }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
-              <span style={{ fontSize: 12, marginLeft: 10 }}>幕墙面板问题</span>
-              <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num0}块</span>
-              <span style={{ marginLeft: 20 }}>破损面积：{this.state.area0} </span>
-            </div>
+          />
+
+          {/* 新增功能, date: 2020-07-04 */}
+          <div className="infoline" style={{ marginTop: 15, width: 400 }}>
+            <label style={{ width: 170, marginRight: 10 }}>最新检测结果分类查询</label>
+            <Select
+              placeholder={'问题分类'}
+              style={{ width: 300, marginTop: 10 }}
+              onChange={this.handleProblemChange}
+            >
+              <Option value="0">幕墙面板问题</Option>
+              <Option value="1">外露构件问题</Option>
+              <Option value="2">承力构件、连接件、连接螺栓问题</Option>
+              <Option value="3">硅酮密封胶、密封胶条问题</Option>
+              <Option value="4">开启系统问题</Option>
+              <Option value="5">幕墙排水系统问题</Option>
+              <Option value="6">硅酮结构密封胶、粘接性能问题</Option>
+            </Select>
           </div>
-        ) : (
-          <div></div>
-        )}
-        {this.state.state == '1' ? (
-          <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span className="colorbox" style={{ backgroundColor: 'orange' }}></span>
-              <span style={{ fontSize: 12, marginLeft: 10 }}>外露构件问题</span>
-              <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num1}块</span>
-              <span style={{ marginLeft: 20 }}>破损面积：{this.state.area1} </span>
-            </div>
-          </div>
-        ) : (
-          <div></div>
-        )}
-        {this.state.state == '2' ? (
-          <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span className="colorbox" style={{ backgroundColor: 'yellow' }}></span>
-              <span style={{ fontSize: 12, marginLeft: 10 }}>承力构件、连接件、连接螺栓问题</span>
-              <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num2}块</span>
-              <span style={{ marginLeft: 20 }}>破损面积：{this.state.area2} </span>
-            </div>
-          </div>
-        ) : (
-          <div></div>
-        )}
-        {this.state.state == '3' ? (
-          <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
-              <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮密封胶、密封胶条问题</span>
-              <hr />
-              <div>
-                <span style={{ marginLeft: 68 }}>主楼幕墙破损：{this.state.PodiumNum}块</span>
-                <span style={{ marginLeft: 20 }}>主楼破损面积：{this.state.PodiumArea} </span>
-                <br />
-                <span style={{ marginLeft: 65 }}>裙楼幕墙破损：{this.state.mainNum}块</span>
-                <span style={{ marginLeft: 20 }}>裙楼破损面积：{this.state.mainArea}</span>
-                <br />
-                <span style={{ marginLeft: 10, marginRight: 10 }}>密封胶受影响区域</span>
-                <Button
-                  ghost
-                  onClick={this.handleshowEffect}
-                  style={{ marginTop: 10, marginRight: 15 }}
-                >
-                  显示
-                </Button>
-                <Button ghost onClick={this.handlehideEffect} style={{ marginTop: 10 }}>
-                  隐藏
-                </Button>
-                <br />
-                {this.state.effect ? (
-                  <>
-                    <span style={{ marginLeft: 68, marginTop: 5 }}>
-                      受影响区总块数：{this.state.effNum}块
-                    </span>
-                    <span style={{ marginLeft: 20, marginTop: 5 }}>
-                      受影响区总面积：{this.state.effArea}{' '}
-                    </span>
-                  </>
-                ) : (
-                  <div></div>
-                )}
+          {this.state.state == '0' ? (
+            <div
+              className="colorline"
+              style={{
+                justifyContent: 'flex-start',
+                marginTop: 10,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>幕墙面板问题</span>
+                <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num0}块</span>
+                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area0} </span>
               </div>
             </div>
-          </div>
-        ) : (
-          <div></div>
-        )}
-
-        {this.state.state == '4' ? (
-          <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span className="colorbox" style={{ backgroundColor: 'black' }}></span>
-              <span style={{ fontSize: 12, marginLeft: 10 }}>开启系统问题</span>
-              <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num4}块</span>
-              <span style={{ marginLeft: 20 }}>破损面积：{this.state.area4} </span>
+          ) : (
+            <div></div>
+          )}
+          {this.state.state == '1' ? (
+            <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="colorbox" style={{ backgroundColor: 'orange' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>外露构件问题</span>
+                <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num1}块</span>
+                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area1} </span>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div></div>
-        )}
-
-        {this.state.state == '5' ? (
-          <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span className="colorbox" style={{ backgroundColor: 'blue' }}></span>
-              <span style={{ fontSize: 12, marginLeft: 10 }}>幕墙排水系统问题</span>
-              <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num5}块</span>
-              <span style={{ marginLeft: 20 }}>破损面积：{this.state.area5} </span>
+          ) : (
+            <div></div>
+          )}
+          {this.state.state == '2' ? (
+            <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="colorbox" style={{ backgroundColor: 'yellow' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>承力构件、连接件、连接螺栓问题</span>
+                <span style={{ marginLeft: 50 }}>幕墙破损：{this.state.num2}块</span>
+                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area2} </span>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div></div>
-        )}
-
-        {this.state.state == '6' ? (
-          <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span className="colorbox" style={{ backgroundColor: 'purple' }}></span>
-              <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮结构密封胶、粘接性能问题</span>
-              <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num6}块</span>
-              <span style={{ marginLeft: 20 }}>破损面积：{this.state.area6} </span>
+          ) : (
+            <div></div>
+          )}
+          {this.state.state == '3' ? (
+            <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮密封胶、密封胶条问题</span>
+                <hr />
+                <div>
+                  <span style={{ marginLeft: 20 }}>主楼幕墙破损：{this.state.PodiumNum}块</span>
+                  <span style={{ marginLeft: 20 }}>主楼破损面积：{this.state.PodiumArea} </span>
+                  <br />
+                  <span style={{ marginLeft: 34 }}>裙楼幕墙破损：{this.state.mainNum}块</span>
+                  <span style={{ marginLeft: 20 }}>裙楼破损面积：{this.state.mainArea}</span>
+                  <br />
+                  <span style={{ marginLeft: 8, marginRight: 10 }}>密封胶受影响区域</span>
+                  <Button
+                    ghost
+                    onClick={this.handleshowEffect}
+                    style={{ marginTop: 10, marginRight: 15 }}
+                  >
+                    显示
+                  </Button>
+                  <Button ghost onClick={this.handlehideEffect} style={{ marginTop: 10 }}>
+                    隐藏
+                  </Button>
+                  <br />
+                  {this.state.effect ? (
+                    <>
+                      <span style={{ marginLeft: 68, marginTop: 5 }}>
+                        受影响区总块数：{this.state.effNum}块
+                      </span>
+                      <span style={{ marginLeft: 20, marginTop: 5 }}>
+                        受影响区总面积：{this.state.effArea}{' '}
+                      </span>
+                    </>
+                  ) : (
+                    <div></div>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div></div>
-        )}
+          ) : (
+            <div></div>
+          )}
 
-        {/* <div style={{ textAlign: 'left', marginTop: 10 }}>
+          {this.state.state == '4' ? (
+            <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="colorbox" style={{ backgroundColor: 'black' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>开启系统问题</span>
+                <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num4}块</span>
+                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area4} </span>
+              </div>
+            </div>
+          ) : (
+            <div></div>
+          )}
+
+          {this.state.state == '5' ? (
+            <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="colorbox" style={{ backgroundColor: 'blue' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>幕墙排水系统问题</span>
+                <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num5}块</span>
+                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area5} </span>
+              </div>
+            </div>
+          ) : (
+            <div></div>
+          )}
+
+          {this.state.state == '6' ? (
+            <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="colorbox" style={{ backgroundColor: 'purple' }}></span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮结构密封胶、粘接性能问题</span>
+                <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num6}块</span> 
+                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area6} </span>
+              </div>
+            </div>
+          ) : (
+            <div></div>
+          )}
+
+          {/* <div style={{ textAlign: 'left', marginTop: 10 }}>
           <span style={{ marginLeft: 10, marginRight: 10 }}>幕墙总检查结果</span>
           <Button ghost onClick={this.handleshowResult} style={{ marginTop: 10, marginRight: 10 }}>
             显示
@@ -1165,7 +1305,8 @@ class Info extends Component {
           <div></div>
         )}
       </div> */}
-     </div>
+        </div>
+      </Draggable>
     );
   }
 }

@@ -4,7 +4,8 @@ import Info from './Info/index';
 import GlassInfo from './Info/GlassInfo';
 import BuildInfo from './Info/BuildInfo';
 import MemberInfo from './Info/MemberInfo';
-import CheckTable from './Info/CheckTable';
+import TableInsky from './TableInsky/index';
+import Draggable from 'react-draggable';
 // import DetailInfo from './Info/DetailInfo';
 import { Input, Button, message } from 'antd';
 import Card from './Card/index';
@@ -31,6 +32,7 @@ class Map extends Component {
       IsLogin: false,
       nameValue: '',
       passValue: '',
+      showtable: false,
     };
   }
 
@@ -149,7 +151,7 @@ class Map extends Component {
   };
 
   // 立面信息
-  flyTo = (lon, lat, hight, heading) => {
+  flyTo2 = (lon, lat, hight, heading) => {
     this.viewer.camera.flyTo({
       destination: Cesium.Cartesian3.fromDegrees(lon, lat, hight), // 设置位置
       orientation: {
@@ -159,7 +161,7 @@ class Map extends Component {
       },
       maximumHeight: 120,
       // flyOverLongitude: Cesium.Math.toRadians(1.0),
-      duration: 3, // 设置飞行持续时间，默认会根据距离来计算
+      duration: 2, // 设置飞行持续时间，默认会根据距离来计算
     });
   };
 
@@ -182,7 +184,7 @@ class Map extends Component {
           console.log(error);
         });
     }
-    this.flyTo(121.486521, 31.243209, 120.0, 100);
+    this.flyTo2(121.486521, 31.243209, 120.0, 100);
   };
 
   // 幕墙信息
@@ -450,6 +452,19 @@ class Map extends Component {
     });
   };
 
+  // 表格显隐
+  showTable = e => {
+    this.setState({
+      showtable: true,
+    });
+  };
+
+  closeTable = () => {
+    this.setState({
+      showtable: false,
+    });
+  };
+
   render() {
     // const layout = {
     //   labelCol: {
@@ -537,19 +552,25 @@ class Map extends Component {
           scene={this.scene}
           arrs={this.state.arrs}
           WFarrs={this.state.WFarrs}
+          showtable={this.state.showtable}
           showModel11={this.state.showModel11}
+          showTable={this.showTable}
           handleHideBuildings={this.handleHideBuildings}
           handleShowBuildings={this.handleShowBuildings}
           handleShowGlassInfo={this.handleShowGlassInfo}
           handleShowBuildInfo={this.handleShowBuildInfo}
           handleShowInfo={this.handleShowInfo}
           jydsPosition={this.jydsPosition}
-          flyTo={this.flyTo}
+          flyTo2={this.flyTo2}
           selectGFColor={e => {
             this.selectGFColor(this.jyds, e);
           }}
           selectWFColor={e => {
             this.selectWFColor(this.jyds, e);
+          }}
+          back={(data, date) => {
+            // console.log(data, date);
+            this.setState({ data: data, date: date });
           }}
         />
         {/* 构件信息 */}
@@ -591,8 +612,29 @@ class Map extends Component {
         ) : (
           <div></div>
         )}
-        {/* 表单面板 */}
-        <CheckTable/>
+
+        {/* 详细表格 */}
+        {this.state.showtable ? (
+          <Draggable>
+            <div className="infobox" style={{ right: 20, width: 600 }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  right: 10,
+                  marginBottom: 15,
+                  top: 5,
+                  cursor: 'pointer',
+                }}
+                onClick={this.closeTable}
+              >
+                X
+              </div>
+              <TableInsky data={this.state.data} date={this.state.date} style={{margin: 15}}/>
+            </div>
+          </Draggable>
+        ) : (
+          <div></div>
+        )}
 
         {/* 幕墙详细信息 */}
         {/* {this.state.showDetailInfo ? (

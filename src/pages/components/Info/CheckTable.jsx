@@ -8,7 +8,7 @@ const dataSource = [
     time: '2020/7/3',
     ballNum: 200,
     ballArea: 423,
-    // bfinishTime: '2020/7/17',
+    bfinishTime: '2020/7/17',
     // aallNum: ,
     // aallArea: ,
     // bfinishTime: '',
@@ -18,93 +18,19 @@ const dataSource = [
     key: '1',
     time: '2019/7/1',
     ballNum: 161,
-    ballArea: 222.28,
     bfinishTime: '2019/7/15',
     aallNum: 0,
-    aallArea: 0,
-    bfinishTime: '2019/7/29',
+    afinishTime: '2019/7/29',
     astatus: '无',
   },
   {
     key: '2',
     time: '2018/7/1',
     ballNum: 99,
-    ballArea: 200.28,
     bfinishTime: '2018/7/15',
     aallNum: 0,
-    aallArea: 0,
-    bfinishTime: '2018/7/29',
+    afinishTime: '2018/7/29',
     astatus: '无',
-  },
-];
-
-const columns = [
-  {
-    title: '日期',
-    dataIndex: 'time',
-    key: 'time',
-    width: 70,
-    align: 'center',
-  },
-  {
-    title: '总损坏数目',
-    dataIndex: 'ballNum',
-    key: 'ballNum',
-    width: 70,
-    align: 'center',
-  },
-  {
-    title: '总损坏面积(平方米)',
-    dataIndex: 'ballArea',
-    key: 'ballArea',
-    width: 70,
-    align: 'center',
-  },
-  {
-    title: '检测完成日期',
-    dataIndex: 'bfinishTime',
-    key: 'bfinishTime',
-    width: 70,
-    align: 'center',
-  },
-  {
-    title: '总损坏数目',
-    dataIndex: 'aallNum',
-    key: 'aallNum',
-    width: 70,
-    align: 'center',
-  },
-  {
-    title: '总损坏面积(平方米)',
-    dataIndex: 'aallArea',
-    key: 'aallArea',
-    width: 70,
-    align: 'center',
-  },
-  {
-    title: '检测完成日期',
-    dataIndex: 'bfinishTime',
-    key: 'afinishTime',
-    width: 70,
-    align: 'center',
-  },
-  {
-    title: '损坏状态',
-    dataIndex: 'astatus',
-    key: 'astatus',
-    width: 70,
-    align: 'center',
-  },
-  {
-    title: '操作',
-    valueType: 'option',
-    dataIndex: 'id',
-    align: 'center',
-    render: (text, row) => [
-      <a key="1" href={row.html_url} target="_blank" rel="noopener noreferrer">
-        查看
-      </a>,
-    ],
   },
 ];
 
@@ -113,55 +39,143 @@ class CheckTable extends Component {
     super(props);
     this.state = {
       value: '',
-      data: [],
+      Data: [],
+      bg: 'yellow',
     };
   }
 
   componentDidMount() {
-    this.setState({
-      data:dataSource
-    })
-    // console.log(Array.isArray(data))
+    this.state.Data = [];
+    this.state.Data[0] = dataSource[0];
   }
 
   handleTimeChange = e => {
+    console.log(e);
+    this.state.Data = [];
     dataSource.map((item, index) => {
       if (index == e) {
-        this.state.data = item;
+        this.state.Data[0] = item;
+      } else if (e == 'all') {
+        this.state.Data = dataSource;
       }
     });
     this.setState({
       value: e,
     });
-    console.log(this.state.data); 
+    // this.props.pushTable();
   };
 
   render() {
-    return (
-      <div className="infobox" style={{ right: 20 }}>
-        {/* <div
-          style={{ position: 'absolute', right: 15, top: 10, cursor: 'pointer' }}
-          onClick={this.props.closeTable}
-        >
-          X
-        </div> */}
-        {/* <div style={{ marginTop: 15 }}> */}
-        <div style={{ marginBottom: 10 }}>
-          <label style={{ marginRight: 10 }}>日期选择</label>
-          <Select
-            placeholder={'选择日期'}
-            style={{ width: 300, marginTop: 10 }}
-            onChange={this.handleTimeChange}
+    const columns = [
+      {
+        title: '日期',
+        dataIndex: 'time',
+        key: 'time',
+        width: 70,
+        align: 'center',
+      },
+      {
+        title: '总损坏数目',
+        dataIndex: 'ballNum',
+        key: 'ballNum',
+        width: 70,
+        align: 'center',
+        className: 'color1',
+      },
+      {
+        title: '检测完成日期',
+        dataIndex: 'bfinishTime',
+        key: 'bfinishTime',
+        width: 70,
+        align: 'center',
+        className: 'color1',
+      },
+      {
+        title: '总损坏数目',
+        dataIndex: 'aallNum',
+        key: 'aallNum',
+        width: 70,
+        align: 'center',
+        className: 'color2',
+      },
+      {
+        title: '检测完成日期',
+        dataIndex: 'bfinishTime',
+        key: 'afinishTime',
+        width: 70,
+        align: 'center',
+        className: 'color2',
+      },
+      {
+        title: '损坏状态',
+        dataIndex: 'astatus',
+        key: 'astatus',
+        width: 70,
+        align: 'center',
+      },
+      {
+        title: '操作',
+        valueType: 'option',
+        dataIndex: 'id',
+        align: 'center',
+        render: (text, record, row) => [
+          <a
+            key="1"
+            onClick={() => {
+              this.props.showTable();
+              this.props.backDate(this.state.date, this.state.value);
+              this.props.pushTable(record);
+            }}
           >
-            <Option value="0">2020/7/3</Option>
-            <Option value="1">2019/7/1</Option>
-            <Option value="2">2018/7/1</Option>
-          </Select>
+            查看
+          </a>,
+        ],
+      },
+    ];
+    return (
+      <div style={{ marginTop: 5, display: 'block' }}>
+        <label style={{ marginRight: 10, marginBottom: 10 }}>检测日期</label>
+        <Select
+          placeholder={'选择日期'}
+          style={{ width: 110, marginTop: 10, marginBottom: 10 }}
+          onChange={this.handleTimeChange}
+        >
+          <Option value="0">2020/7/3</Option>
+          <Option value="1">2019/7/1</Option>
+          <Option value="2">2018/7/1</Option>
+          <Option value="all">全部时间</Option>
+        </Select>
+        <Table
+          columns={columns}
+          // rowClassName={(record, index) => {
+          //   if (record.key == this.state.bg) {
+          //     return 'bg';
+          //   }
+          // }}
+          dataSource={this.state.Data}
+          size="small"
+          // onRow={record => {
+          //   return {
+          //     onClick: event => {
+          //       console.log(record.time);
+          //       this.setState({ date: record.time });
+          //       this.props.backDate(this.state.date, this.state.value);
+          //       this.props.pushTable();
+          //     }, // 鼠标移入行
+          //   };
+          // }}
+        />
+        <div style={{ float: 'left', marginLeft: 10, marginTop: -40 }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span className="colorbox" style={{ backgroundColor: '#002743' }}></span>
+            <span style={{ fontSize: 12, marginLeft: 10 }}>检测结果</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span className="colorbox" style={{ backgroundColor: '#415b7' }}></span>
+            <span style={{ fontSize: 12, marginLeft: 10 }}>修复后结果</span>
+          </div>
         </div>
-
-        <Table columns={columns} dataSource={this.state.data} />
       </div>
-      // </div>
     );
   }
 }
