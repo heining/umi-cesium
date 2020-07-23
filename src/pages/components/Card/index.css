@@ -70,10 +70,6 @@
   font-size: 3px;
 }
 
-.ant-table-row:hover > td {
-  background-color: #1f5271;
+.ant-table-tbody > tr:hover > td{
+  background:transparent ! important;
 }
-
-/* .bg:hover {
-  background-color: yellow;
-} */

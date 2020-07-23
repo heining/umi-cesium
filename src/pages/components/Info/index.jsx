@@ -193,25 +193,25 @@ class Info extends Component {
     }
   };
 
-  // 玻璃改变
-  handleGlassChange = e => {
-    // 选中效果
-    this.props.jyds.style = new Cesium.Cesium3DTileStyle({
-      // show: true,
-      // feature: 切片
-      color: {
-        evaluateColor: function(feature, result) {
-          const featureId = feature.getProperty('id');
-          // 循环遍历的id值要等于输入的id
-          if (featureId == e) {
-            return Cesium.Color.clone(Cesium.Color.RED, result);
-          } else {
-            return Cesium.Color.clone(Cesium.Color.WHITE, result);
-          }
-        },
-      },
-    });
-  };
+  // // 玻璃改变
+  // handleGlassChange = e => {
+  //   // 选中效果
+  //   this.props.jyds.style = new Cesium.Cesium3DTileStyle({
+  //     // show: true,
+  //     // feature: 切片
+  //     color: {
+  //       evaluateColor: function(feature, result) {
+  //         const featureId = feature.getProperty('id');
+  //         // 循环遍历的id值要等于输入的id
+  //         if (featureId == e) {
+  //           return Cesium.Color.clone(Cesium.Color.RED, result);
+  //         } else {
+  //           return Cesium.Color.clone(Cesium.Color.WHITE, result);
+  //         }
+  //       },
+  //     },
+  //   });
+  // };
 
   // 获取input中输入的值
   handleChange = e => {
@@ -373,22 +373,12 @@ class Info extends Component {
         }
         if (e == 0 || e == 3 || e == 7) {
           // 北面
-          that.props.flyTo2(121.495592, 31.2439895, 120.0, 130);
+          that.props.flyTo(121.495592, 31.2439895, 120.0, 130);
         } else if (e == 6) {
           // 南面
-          that.props.flyTo2(121.503292, 31.2385895, 120.0, -50);
+          that.props.flyTo(121.503292, 31.2385895, 120.0, -50);
         } else {
-          // 初始
-          that.props.viewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(121.494521, 31.242109, 120.0), // 设置位置
-            orientation: {
-              heading: Cesium.Math.toRadians(100), // 方向
-              pitch: Cesium.Math.toRadians(0), // 倾斜角度
-              roll: 0,
-            },
-            maximumHeight: 120,
-            duration: 2, // 设置飞行持续时间，默认会根据距离来计算
-          });
+          that.props.flyTo(121.494521, 31.242109, 120.0, 100);
         }
       })
       .catch(function(error) {
@@ -607,27 +597,34 @@ class Info extends Component {
 
   handleEast = () => {
     this.props.handleHideBuildings();
-    this.props.flyTo2(121.502592, 31.2443895, 120.0, -140);
+    this.props.flyTo(121.502592, 31.2443895, 120.0, -140);
   };
 
   handleSouth = () => {
     this.props.handleHideBuildings();
-    this.props.flyTo2(121.503292, 31.2385895, 120.0, -50);
+    this.props.flyTo(121.503292, 31.2385895, 120.0, -50);
   };
 
   handleWest = () => {
     this.props.handleHideBuildings();
-    this.props.flyTo2(121.496292, 31.2378895, 120.0, 40);
+    this.props.flyTo(121.496292, 31.2378895, 120.0, 40);
   };
 
   handleNorth = () => {
     this.props.handleHideBuildings();
-    this.props.flyTo2(121.495592, 31.2439895, 120.0, 130);
+    this.props.flyTo(121.495592, 31.2439895, 120.0, 130);
   };
 
   // 显示密封胶受影响区
   handleshowEffect = async () => {
     const that = this;
+    let effectArr = [];
+    let eff = [];
+    arr3.map((item, index) => {
+      effectArr = effectArr.concat(getEffect(item));
+    });
+    // 受影响区集合
+    eff = effectArr.filter(item => !arr3.includes(item));
     // 显色
     that.props.jyds.style = new Cesium.Cesium3DTileStyle({
       // show: true,
@@ -658,13 +655,6 @@ class Info extends Component {
     that.setState({
       effect: false,
     });
-    let effectArr = [];
-    let eff = [];
-    arr3.map((item, index) => {
-      effectArr = effectArr.concat(getEffect(item));
-    });
-    // 受影响区集合
-    eff = effectArr.filter(item => !arr3.includes(item));
     that.props.jyds.style = new Cesium.Cesium3DTileStyle({
       // show: true,
       color: {
@@ -681,48 +671,48 @@ class Info extends Component {
   };
 
   // 显示总检查结果
-  handleshowResult = () => {
-    const that = this;
-    that.setState({
-      btn: true,
-    });
-    // 选中效果
-    that.props.jyds.style = new Cesium.Cesium3DTileStyle({
-      // show: true,
-      // feature: 切片
-      color: {
-        evaluateColor: function(feature, result) {
-          const featureId = feature.getProperty('id');
-          if (arrAll.includes(featureId)) {
-            return Cesium.Color.clone(Cesium.Color.PURPLE, result);
-          } else {
-            return Cesium.Color.clone(Cesium.Color.WHITE, result);
-          }
-        },
-      },
-    });
-  };
+  // handleshowResult = () => {
+  //   const that = this;
+  //   that.setState({
+  //     btn: true,
+  //   });
+  //   // 选中效果
+  //   that.props.jyds.style = new Cesium.Cesium3DTileStyle({
+  //     // show: true,
+  //     // feature: 切片
+  //     color: {
+  //       evaluateColor: function(feature, result) {
+  //         const featureId = feature.getProperty('id');
+  //         if (arrAll.includes(featureId)) {
+  //           return Cesium.Color.clone(Cesium.Color.PURPLE, result);
+  //         } else {
+  //           return Cesium.Color.clone(Cesium.Color.WHITE, result);
+  //         }
+  //       },
+  //     },
+  //   });
+  // };
 
   // 隐藏总检查结果
-  handlehideResult = () => {
-    const that = this;
-    that.setState({
-      btn: false,
-    });
-    // 选中效果
-    that.props.jyds.style = new Cesium.Cesium3DTileStyle({
-      // show: true,
-      // feature: 切片
-      color: {
-        evaluateColor: function(feature, result) {
-          const featureId = feature.getProperty('id');
-          if (featureId) {
-            return Cesium.Color.clone(Cesium.Color.WHITE, result);
-          }
-        },
-      },
-    });
-  };
+  // handlehideResult = () => {
+  //   const that = this;
+  //   that.setState({
+  //     btn: false,
+  //   });
+  //   // 选中效果
+  //   that.props.jyds.style = new Cesium.Cesium3DTileStyle({
+  //     // show: true,
+  //     // feature: 切片
+  //     color: {
+  //       evaluateColor: function(feature, result) {
+  //         const featureId = feature.getProperty('id');
+  //         if (featureId) {
+  //           return Cesium.Color.clone(Cesium.Color.WHITE, result);
+  //         }
+  //       },
+  //     },
+  //   });
+  // };
 
   async componentDidMount() {
     const that = this;
@@ -878,7 +868,7 @@ class Info extends Component {
       that.state.data['3'] = [that.state.num21, that.state.area21, 0, 0];
       that.state.data['41'] = [14, 48.51, 0, 0];
       that.state.data['42'] = [58, 91.89, 0, 0];
-      that.state.data['43'] = [73, 140.40, 0, 0];
+      that.state.data['43'] = [73, 140.4, 0, 0];
       that.state.data['44'] = [2948, 6160, 0, 0];
       that.state.data['5'] = [that.state.num41, that.state.area41, 0, 0];
       that.state.data['6'] = [that.state.num51, that.state.area51, 0, 0];
@@ -922,7 +912,7 @@ class Info extends Component {
                 width: 100,
                 float: 'left',
                 color: 'white',
-                marginLeft: 15
+                marginLeft: 15,
               }}
               onClick={this.props.handleShowBuildInfo}
             >
@@ -935,7 +925,7 @@ class Info extends Component {
                 width: 100,
                 float: 'left',
                 color: 'white',
-                marginLeft: 30
+                marginLeft: 30,
               }}
               onClick={this.props.handleShowGlassInfo}
             >
@@ -948,7 +938,7 @@ class Info extends Component {
                 width: 100,
                 float: 'left',
                 color: 'white',
-                marginLeft: 30
+                marginLeft: 30,
               }}
               onClick={this.props.handleShowInfo}
             >
@@ -980,7 +970,7 @@ class Info extends Component {
               检测状态
             </Radio> */}
             </Radio.Group>
-            <Button ghost onClick={this.props.jydsPosition} style={{left: 10}}>
+            <Button ghost onClick={this.props.jydsPosition} style={{ left: 10 }}>
               视图复位
             </Button>
           </div>
@@ -1206,7 +1196,7 @@ class Info extends Component {
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span className="colorbox" style={{ backgroundColor: 'purple' }}></span>
                 <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮结构密封胶、粘接性能问题</span>
-                <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num6}块</span> 
+                <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num6}块</span>
                 <span style={{ marginLeft: 20 }}>破损面积：{this.state.area6} </span>
               </div>
             </div>

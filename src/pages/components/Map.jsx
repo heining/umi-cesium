@@ -6,7 +6,6 @@ import BuildInfo from './Info/BuildInfo';
 import MemberInfo from './Info/MemberInfo';
 import TableInsky from './TableInsky/index';
 import Draggable from 'react-draggable';
-// import DetailInfo from './Info/DetailInfo';
 import { Input, Button, message } from 'antd';
 import Card from './Card/index';
 import History from './Card/History';
@@ -98,7 +97,7 @@ class Map extends Component {
         // 根据每块玻璃的ID区分
         const name = pick.getProperty('id');
         // console.log(name);
-        if (name.includes('GF')) {
+        if (name.includes('—')) {
           selected.feature = pick;
           if (pick === highlighted.feature) {
             Cesium.Color.clone(highlighted.originalColor, selected.originalColor);
@@ -111,20 +110,6 @@ class Map extends Component {
             id: name,
             showHistory: false,
           });
-        } else if (name.includes('WF')) {
-          selected.feature = pick;
-          if (pick === highlighted.feature) {
-            Cesium.Color.clone(highlighted.originalColor, selected.originalColor);
-            highlighted.feature = undefined;
-          } else {
-            Cesium.Color.clone(pick.color, selected.originalColor);
-          }
-          this.setState({
-            showDetail: true,
-            id: name,
-            showHistory: false,
-          });
-          // console.log(this.state.WFid);
         }
       }
     }
@@ -147,11 +132,11 @@ class Map extends Component {
       this.model11.show = false;
     }
     // 跳转到交银大厦的最佳视图
-    this.jydsPosition();
+    this.flyTo(121.494521, 31.242109, 120.0, 100);
   };
 
   // 立面信息
-  flyTo2 = (lon, lat, hight, heading) => {
+  flyTo = (lon, lat, hight, heading) => {
     this.viewer.camera.flyTo({
       destination: Cesium.Cartesian3.fromDegrees(lon, lat, hight), // 设置位置
       orientation: {
@@ -165,10 +150,23 @@ class Map extends Component {
     });
   };
 
+  jydsPosition = () => {
+    this.viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(121.494521, 31.242109, 120.0), // 设置位置
+      orientation: {
+        heading: Cesium.Math.toRadians(100), // 方向
+        pitch: Cesium.Math.toRadians(0), // 倾斜角度
+        roll: 0,
+      },
+      duration: 2, // 设置飞行持续时间，默认会根据距离来计算
+    });
+  };
+  
   handleShowBuildings = () => {
     if (this.model11) {
       this.model11.show = true;
     } else {
+      message.info('正在加载楼群，请稍等！')
       const model11 = new Cesium.Cesium3DTileset({
         url: 'http://cdn.lesuidao.cn/ljz_714/tileset.json',
         maximumScreenSpaceError: 160, //细化程度的最大屏幕空间错误（提高清晰度）
@@ -184,7 +182,7 @@ class Map extends Component {
           console.log(error);
         });
     }
-    this.flyTo2(121.486521, 31.243209, 120.0, 100);
+    this.flyTo(121.486521, 31.243209, 120.0, 100);
   };
 
   // 幕墙信息
@@ -201,7 +199,6 @@ class Map extends Component {
   };
 
   // 建筑信息
-
   handleShowBuildInfo = () => {
     this.setState({
       showBuildInfo: true,
@@ -233,62 +230,7 @@ class Map extends Component {
     });
   };
 
-  handleName = e => {
-    // console.log(e.target.value);
-    this.setState({
-      nameValue: e.target.value,
-    });
-    if (this.state.nameValue !== 'inskylab') {
-      message.info('用户名错误，请重新输入');
-    }
-  };
-  handlePass = e => {
-    // console.log(e.target.value);
-    this.setState({
-      PassValue: e.target.value,
-    });
-    if (this.state.nameValue !== '123456') {
-      message.info('密码错误，请重新输入');
-    }
-  };
-
-  handleClick = () => {
-    message.info('登录成功');
-  };
-
-  // handleShowDetailInfo = () => {
-  //   this.setState({
-  //     showDetailInfo: true,
-  //   });
-  // };
-
-  // handleHideDetailInfo = () => {
-  //   this.setState({
-  //     showDetailInfo: false
-  //   })
-  // }
-
-  flyTO = target => {
-    this.viewer.flyTo(target);
-  };
-
-  jydsPosition = () => {
-    this.viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(121.494521, 31.242109, 120.0), // 设置位置
-      orientation: {
-        heading: Cesium.Math.toRadians(100), // 方向
-        pitch: Cesium.Math.toRadians(0), // 倾斜角度
-        roll: 0,
-      },
-      duration: 2, // 设置飞行持续时间，默认会根据距离来计算
-    });
-  };
-
   componentDidMount() {
-    // let script = document.createElement('script');
-    // script.type = 'text/javascript';
-    // script.src = `https://cesium.com/downloads/cesiumjs/releases/1.70.1/Build/Cesium/Cesium.js`;
-    // document.body.appendChild(script);
     const that = this;
     Cesium.Ion.defaultAccessToken =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiMzYxYTk3My01YjI2LTRiZjktOGU5ZC00MDQxZTJjZTRkYmUiLCJpZCI6Mjg0NjQsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTEyNjM0NTh9.zXiMNn0iN0bPaIqze4z4OC50aiID0B8-2d59_LkV0QU';
@@ -310,10 +252,10 @@ class Map extends Component {
     layer0.gamma = 0.88;
     // 隐藏页面控件
     viewer._cesiumWidget._creditContainer.style.display = 'none';
-    this.viewer = viewer;
+    that.viewer = viewer;
     // 创建场景对象
     const scene = viewer.scene;
-    this.scene = scene;
+    that.scene = scene;
     // 场景的后期处理
     viewer.scene.postProcessStages.fxaa.enabled = true;
     // 添加贴图
@@ -322,10 +264,10 @@ class Map extends Component {
       maximumScreenSpaceError: 16, //细化程度的最大屏幕空间错误（提高清晰度）
       maximumMemoryUsage: 1024,
     });
-    this.jyds = jyds;
+    that.jyds = jyds;
     jyds.readyPromise
       .then(jyds => {
-        this.modelRotation(jyds, 50, 121.499487, 31.24127, 90.77);
+        that.modelRotation(jyds, 50, 121.499487, 31.24127, 90.77);
         jyds.style = new Cesium.Cesium3DTileStyle({
           // show: true,
           color: {
@@ -353,13 +295,13 @@ class Map extends Component {
         console.log(error);
       });
 
-    that.setState({
-      arrs,
-      WFarrs,
-    });
+    // that.setState({
+    //   arrs,
+    //   WFarrs,
+    // });
 
     // 跳转
-    this.jydsPosition();
+    that.jydsPosition();
 
     // 定位
     // viewer.zoomTo(jyds);
@@ -369,14 +311,14 @@ class Map extends Component {
       feature: undefined,
       originalColor: new Cesium.Color(),
     };
-    this.selected = selected;
+    that.selected = selected;
     // 判断viewer是否支持高光
     if (Cesium.PostProcessStageLibrary.isSilhouetteSupported(viewer.scene)) {
       let highlighted = {
         feature: undefined,
         originalColor: new Cesium.Color(),
       };
-      this.highlighted = highlighted;
+      that.highlighted = highlighted;
     }
     const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
     // 鼠标移动事件
@@ -453,12 +395,11 @@ class Map extends Component {
   };
 
   // 表格显隐
-  showTable = e => {
+  showTable = () => {
     this.setState({
       showtable: true,
     });
   };
-
   closeTable = () => {
     this.setState({
       showtable: false,
@@ -466,68 +407,7 @@ class Map extends Component {
   };
 
   render() {
-    // const layout = {
-    //   labelCol: {
-    //     span: 8,
-    //   },
-    //   wrapperCol: {
-    //     span: 16,
-    //   },
-    // };
     return (
-      // <div>
-      //   <div
-      //     style={{
-      //       position: 'absolute',
-      //       width: '100vw',
-      //       height: '100vh',
-      //       zIndex: 2,
-      //       backgroundColor: 'white',
-      //     }}
-      //   >
-      /* <Form {...layout} style={{paddingTop: '20%'}}>
-            <Form.Item
-              label="用户名"
-              name="username"
-              rules={[
-                {
-                  required: true,
-                  max: 12,
-                  min: 6,
-                  pattern: [/a-zA-Z/g],
-                  message: 'Please input your username!',
-                }
-              ]}
-              style={{ width: 400 }}
-            >
-              <Input onChange={this.handleName}/>
-            </Form.Item>
-            <Form.Item
-              label="密码"
-              name="password"
-              rules={[
-                {
-                  required: true,
-                  max: 12,
-                  min: 6,
-                  pattern: [/a-zA-Z0-9/g],
-                  message: 'Please input your password!',
-                }
-              ]}
-              style={{ width: 400 }}
-            >
-              <Input.Password />
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" onClick={this.handleClick}>
-                登录
-              </Button>
-            </Form.Item>
-          </Form> */
-      //   <Input placeholder='用户名' style={{width: 300, marginBottom: 20}} maxLength={8} value={this.state.nameValue} onChange={this.handleName}/><br />
-      //   <Input placeholder ='密码' style={{width: 300, marginBottom: 20}} maxLength={12} value={this.state.passValue} onChange={this.handlePass}/><br />
-      //   <Button onClick={this.handleClick}>登录</Button>
-      // </div>
       <div id="cesiumContainer" style={{ width: '100vw', height: '100vh' }}>
         {/* <div
             style={{
@@ -560,8 +440,8 @@ class Map extends Component {
           handleShowGlassInfo={this.handleShowGlassInfo}
           handleShowBuildInfo={this.handleShowBuildInfo}
           handleShowInfo={this.handleShowInfo}
+          flyTo={this.flyTo}
           jydsPosition={this.jydsPosition}
-          flyTo2={this.flyTo2}
           selectGFColor={e => {
             this.selectGFColor(this.jyds, e);
           }}
@@ -569,7 +449,6 @@ class Map extends Component {
             this.selectWFColor(this.jyds, e);
           }}
           back={(data, date) => {
-            // console.log(data, date);
             this.setState({ data: data, date: date });
           }}
         />
@@ -635,15 +514,7 @@ class Map extends Component {
         ) : (
           <div></div>
         )}
-
-        {/* 幕墙详细信息 */}
-        {/* {this.state.showDetailInfo ? (
-            <DetailInfo handleHideDetailInfo={this.handleHideDetailInfo} />
-          ) : (
-            <div></div>
-          )} */}
       </div>
-      // </div>
     );
   }
 }

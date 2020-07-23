@@ -151,19 +151,34 @@ const TableInsky = props => {
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 48, lineHeight: '48px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 48,
+            lineHeight: '48px',
+          }}
         >
           {data['1'][0]}
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 48, lineHeight: '48px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 48,
+            lineHeight: '48px',
+          }}
         >
           {data['1'][1]}
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 48, lineHeight: '48px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 48,
+            lineHeight: '48px',
+          }}
         >
           {data['1'][2]}
         </div>
@@ -204,7 +219,12 @@ const TableInsky = props => {
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 48, lineHeight: '48px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 48,
+            lineHeight: '48px',
+          }}
         >
           {data['2'][0]}
         </div>
@@ -221,7 +241,12 @@ const TableInsky = props => {
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 48, lineHeight: '48px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 48,
+            lineHeight: '48px',
+          }}
         >
           {data['2'][2]}
         </div>
@@ -266,7 +291,12 @@ const TableInsky = props => {
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 54, lineHeight: '54px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 54,
+            lineHeight: '54px',
+          }}
         >
           {data['3'][0]}
         </div>
@@ -283,7 +313,12 @@ const TableInsky = props => {
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 54, lineHeight: '54px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 54,
+            lineHeight: '54px',
+          }}
         >
           {data['3'][2]}
         </div>
@@ -377,7 +412,12 @@ const TableInsky = props => {
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 84, lineHeight: '84px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 84,
+            lineHeight: '84px',
+          }}
         >
           <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div
@@ -420,7 +460,12 @@ const TableInsky = props => {
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 84, lineHeight: '27px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 84,
+            lineHeight: '27px',
+          }}
         >
           <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div
@@ -463,7 +508,12 @@ const TableInsky = props => {
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 84, lineHeight: '84px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 84,
+            lineHeight: '84px',
+          }}
         >
           <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div
@@ -504,7 +554,7 @@ const TableInsky = props => {
             </div>
           </div>
         </div>
-        <div className={styles.col4} style={{ color: "white", height: 84, lineHeight: '27px' }}>
+        <div className={styles.col4} style={{ color: 'white', height: 84, lineHeight: '27px' }}>
           <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div
               style={{
@@ -578,19 +628,34 @@ const TableInsky = props => {
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 48, lineHeight: '48px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 48,
+            lineHeight: '48px',
+          }}
         >
           {data['5'][0]}
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 48, lineHeight: '48px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 48,
+            lineHeight: '48px',
+          }}
         >
           {data['5'][1]}
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 48, lineHeight: '48px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 48,
+            lineHeight: '48px',
+          }}
         >
           {data['5'][2]}
         </div>
@@ -631,19 +696,34 @@ const TableInsky = props => {
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 48, lineHeight: '48px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 48,
+            lineHeight: '48px',
+          }}
         >
           {data['6'][0]}
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 48, lineHeight: '48px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 48,
+            lineHeight: '48px',
+          }}
         >
           {data['6'][1]}
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 48, lineHeight: '48px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 48,
+            lineHeight: '48px',
+          }}
         >
           {data['6'][2]}
         </div>
@@ -678,19 +758,34 @@ const TableInsky = props => {
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 48, lineHeight: '48px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 48,
+            lineHeight: '48px',
+          }}
         >
           {data['7'][0]}
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 48, lineHeight: '48px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 48,
+            lineHeight: '48px',
+          }}
         >
           {data['7'][1]}
         </div>
         <div
           className={styles.col4}
-          style={{ borderRight: '0.5px solid white', color: "white", height: 48, lineHeight: '48px' }}
+          style={{
+            borderRight: '0.5px solid white',
+            color: 'white',
+            height: 48,
+            lineHeight: '48px',
+          }}
         >
           {data['7'][2]}
         </div>

@@ -7,11 +7,10 @@ const dataSource = [
     key: '0',
     time: '2020/7/3',
     ballNum: 200,
-    ballArea: 423,
     bfinishTime: '2020/7/17',
     // aallNum: ,
     // aallArea: ,
-    // bfinishTime: '',
+    // afinishTime: '',
     // astatus: ''
   },
   {
@@ -40,7 +39,6 @@ class CheckTable extends Component {
     this.state = {
       value: '',
       Data: [],
-      bg: 'yellow',
     };
   }
 
