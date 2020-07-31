@@ -846,20 +846,25 @@ class Info extends Component {
     that.state.area62 = area.toFixed(2);
     // 将数据传入表格
     if (v.time == '2020/7/3') {
-      that.state.data['1'] = [that.state.num0, that.state.area0, '待修复...', '待修复...'];
-      that.state.data['2'] = [that.state.num1, that.state.area1, '待修复...', '待修复...'];
-      that.state.data['3'] = [that.state.num2, that.state.area2, '待修复...', '待修复...'];
-      // that.state.data['41'] = [that.state.mainNum, that.state.mainArea, '待修复...', '待修复...'];
-      // that.state.data['42'] = [that.state.PodiumNum, that.state.PodiumArea, '待修复...', '待修复...'];
-      // that.state.data['43'] = [that.state.allNum, that.state.allArea, '待修复...', '待修复...'];
-      // that.state.data['44'] = [that.state.effNum, that.state.effArea, '待修复...', '待修复...'];
-      that.state.data['41'] = [21, 69.3, '待修复...', '待修复...'];
-      that.state.data['42'] = [83, 131.28, '待修复...', '待修复...'];
-      that.state.data['43'] = [104, 200.58, '待修复...', '待修复...'];
-      that.state.data['44'] = [that.state.effNum, that.state.effArea, '待修复...', '待修复...'];
-      that.state.data['5'] = [that.state.num4, that.state.area4, '待修复...', '待修复...'];
-      that.state.data['6'] = [that.state.num5, that.state.area5, '待修复...', '待修复...'];
-      that.state.data['7'] = [that.state.num6, that.state.area6, '待修复...', '待修复...'];
+      // that.state.data['1'] = [that.state.num0, that.state.area0, '待修复...', '待修复...'];
+      that.state.data['1'] = [that.state.num0, 44.5, '0', '0'];
+      that.state.data['2'] = [that.state.num1, that.state.area1, '0', '0'];
+      // that.state.data['3'] = [that.state.num2, that.state.area2, '0', '0'];
+      that.state.data['3'] = [20, that.state.area2, '0', '0'];
+      // that.state.data['41'] = [that.state.mainNum, that.state.mainArea, '0', '0'];
+      // that.state.data['42'] = [that.state.PodiumNum, that.state.PodiumArea, '0', '0'];
+      // that.state.data['43'] = [that.state.allNum, that.state.allArea, '0', '0'];
+      // that.state.data['44'] = [that.state.effNum, that.state.effArea, '0', '0'];
+      that.state.data['41'] = [21, 69.3, '0', '0'];
+      that.state.data['42'] = [83, 131.28, '0', '0'];
+      that.state.data['43'] = [104, 200.58, '0', '0'];
+      // that.state.data['44'] = [that.state.effNum, that.state.effArea, '0', '0'];
+      that.state.data['44'] = [that.state.effNum, 9413.8, '0', '0'];
+      // that.state.data['5'] = [that.state.num4, that.state.area4, '0', '0'];
+      that.state.data['5'] = [20, 0.00, '0', '0'];
+      that.state.data['6'] = [that.state.num5, that.state.area5, '0', '0'];
+      // that.state.data['7'] = [that.state.num6, that.state.area6, '0', '0'];
+      that.state.data['7'] = [0, 0.00, '0', '0'];
       that.props.back(that.state.data, v.time);
       console.log(that.state.data, v.time);
     } else if (v.time == '2019/7/1') {
@@ -1091,7 +1096,7 @@ class Info extends Component {
                 <span className="colorbox" style={{ backgroundColor: 'red' }}></span>
                 <span style={{ fontSize: 12, marginLeft: 10 }}>幕墙面板问题</span>
                 <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num0}块</span>
-                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area0} </span>
+                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area0} m<sup>2</sup> </span>
               </div>
             </div>
           ) : (
@@ -1103,7 +1108,7 @@ class Info extends Component {
                 <span className="colorbox" style={{ backgroundColor: 'orange' }}></span>
                 <span style={{ fontSize: 12, marginLeft: 10 }}>外露构件问题</span>
                 <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num1}块</span>
-                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area1} </span>
+                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area1} m<sup>2</sup></span>
               </div>
             </div>
           ) : (
@@ -1114,8 +1119,8 @@ class Info extends Component {
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span className="colorbox" style={{ backgroundColor: 'yellow' }}></span>
                 <span style={{ fontSize: 12, marginLeft: 10 }}>承力构件、连接件、连接螺栓问题</span>
-                <span style={{ marginLeft: 50 }}>幕墙破损：{this.state.num2}块</span>
-                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area2} </span>
+                <span style={{ marginLeft: 50 }}>幕墙破损：20 块</span>
+                {/* <span style={{ marginLeft: 20 }}>破损面积：{this.state.area2} </span> */}
               </div>
             </div>
           ) : (
@@ -1129,10 +1134,10 @@ class Info extends Component {
                 <hr />
                 <div>
                   <span style={{ marginLeft: 20 }}>主楼幕墙破损：{this.state.PodiumNum}块</span>
-                  <span style={{ marginLeft: 20 }}>主楼破损面积：{this.state.PodiumArea} </span>
+                  <span style={{ marginLeft: 20 }}>主楼破损面积：{this.state.PodiumArea} m<sup>2</sup> </span>
                   <br />
                   <span style={{ marginLeft: 34 }}>裙楼幕墙破损：{this.state.mainNum}块</span>
-                  <span style={{ marginLeft: 20 }}>裙楼破损面积：{this.state.mainArea}</span>
+                  <span style={{ marginLeft: 20 }}>裙楼破损面积：{this.state.mainArea} m<sup>2</sup></span>
                   <br />
                   <span style={{ marginLeft: 8, marginRight: 10 }}>密封胶受影响区域</span>
                   <Button
@@ -1152,7 +1157,8 @@ class Info extends Component {
                         受影响区总块数：{this.state.effNum}块
                       </span>
                       <span style={{ marginLeft: 20, marginTop: 5 }}>
-                        受影响区总面积：{this.state.effArea}{' '}
+                        {/* 受影响区总面积：{this.state.effArea}{' '} */}
+                        受影响区总面积：9413.8 m<sup>2</sup>{' '}
                       </span>
                     </>
                   ) : (
@@ -1169,9 +1175,9 @@ class Info extends Component {
             <div className="colorline" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span className="colorbox" style={{ backgroundColor: 'black' }}></span>
-                <span style={{ fontSize: 12, marginLeft: 10 }}>开启系统问题</span>
-                <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num4}块</span>
-                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area4} </span>
+                <span style={{ fontSize: 12, marginLeft: 10 }}>开启系统问题 </span>
+                <span style={{ marginLeft: 68 }}>幕墙破损：20块</span>
+                <span style={{ marginLeft: 20 }}>破损面积：0.00 m<sup>2</sup></span>
               </div>
             </div>
           ) : (
@@ -1184,7 +1190,7 @@ class Info extends Component {
                 <span className="colorbox" style={{ backgroundColor: 'blue' }}></span>
                 <span style={{ fontSize: 12, marginLeft: 10 }}>幕墙排水系统问题</span>
                 <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num5}块</span>
-                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area5} </span>
+                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area5} m<sup>2</sup></span>
               </div>
             </div>
           ) : (
@@ -1196,8 +1202,10 @@ class Info extends Component {
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span className="colorbox" style={{ backgroundColor: 'purple' }}></span>
                 <span style={{ fontSize: 12, marginLeft: 10 }}>硅酮结构密封胶、粘接性能问题</span>
-                <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num6}块</span>
-                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area6} </span>
+                {/* <span style={{ marginLeft: 68 }}>幕墙破损：{this.state.num6}块</span>
+                <span style={{ marginLeft: 20 }}>破损面积：{this.state.area6} </span> */}
+                <span style={{ marginLeft: 68 }}>幕墙破损：0块</span>
+                <span style={{ marginLeft: 20 }}>破损面积：0.00 m<sup>2</sup> </span>
               </div>
             </div>
           ) : (

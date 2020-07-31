@@ -7,7 +7,12 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Row, Col } from 'antd';
 import styles from './index.less';
-
+/**
+ *
+ *
+ * @param {*} props
+ * @returns
+ */
 const TableInsky = props => {
   console.log(props.data);
   const { data, date } = props;
