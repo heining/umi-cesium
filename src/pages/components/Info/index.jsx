@@ -1,8 +1,3 @@
-/**
- * @ Select选择框联动
- * date: 2020-06-30
- */
-
 import React, { Component } from 'react';
 import request from 'umi-request';
 import * as Cesium from 'cesium';
@@ -157,14 +152,6 @@ class Info extends Component {
       GFfloor.push(i);
       WFfloor.push(i);
     }
-    // GFfloor.sort(function(a, b) {
-    //   // 这是比较函数
-    //   return a - b; // 降序
-    // });
-    // WFfloor.sort(function(a, b) {
-    //   // 这是比较函数
-    //   return a - b; // 降序
-    // });
     this.setState({
       style: e,
       arrs,
@@ -174,12 +161,6 @@ class Info extends Component {
     // 跳转
     // this.props.viewer.flyTo(this.props.jyds);
   };
-
-  // handleWFChange = e => {
-  //   // console.log(e);
-  //   // this.selectWFColor(this.props.jyds, e);
-  //   this.props.selectWFColor(e);
-  // };
 
   handleFChange = e => {
     console.log(e);
@@ -847,7 +828,8 @@ class Info extends Component {
     // 将数据传入表格
     if (v.time == '2020/7/3') {
       // that.state.data['1'] = [that.state.num0, that.state.area0, '待修复...', '待修复...'];
-      that.state.data['1'] = [that.state.num0, 44.5, '0', '0'];
+      that.state.data['11'] = [4,  12.42, '0', '0'];
+      that.state.data['12'] = [15, 44.5, '0', '0'];
       that.state.data['2'] = [that.state.num1, that.state.area1, '0', '0'];
       // that.state.data['3'] = [that.state.num2, that.state.area2, '0', '0'];
       that.state.data['3'] = [20, that.state.area2, '0', '0'];
@@ -861,14 +843,16 @@ class Info extends Component {
       // that.state.data['44'] = [that.state.effNum, that.state.effArea, '0', '0'];
       that.state.data['44'] = [that.state.effNum, 9413.8, '0', '0'];
       // that.state.data['5'] = [that.state.num4, that.state.area4, '0', '0'];
-      that.state.data['5'] = [20, 0.00, '0', '0'];
+      that.state.data['5'] = [20, that.state.area62, '0', '0'];
       that.state.data['6'] = [that.state.num5, that.state.area5, '0', '0'];
       // that.state.data['7'] = [that.state.num6, that.state.area6, '0', '0'];
-      that.state.data['7'] = [0, 0.00, '0', '0'];
+      that.state.data['7'] = [0, that.state.area62, '0', '0'];
       that.props.back(that.state.data, v.time);
       console.log(that.state.data, v.time);
     } else if (v.time == '2019/7/1') {
-      that.state.data['1'] = [that.state.num01, that.state.area01, 0, 0];
+      // that.state.data['1'] = [that.state.num01, that.state.area01, 0, 0];
+      that.state.data['11'] = [3, 8.69, '0', '0'];
+      that.state.data['12'] = [10, 31.15, '0', '0'];
       that.state.data['2'] = [that.state.num11, that.state.area11, 0, 0];
       that.state.data['3'] = [that.state.num21, that.state.area21, 0, 0];
       that.state.data['41'] = [14, 48.51, 0, 0];
@@ -880,7 +864,9 @@ class Info extends Component {
       that.state.data['7'] = [that.state.num61, that.state.area61, 0, 0];
       that.props.back(that.state.data, v.time);
     } else {
-      that.state.data['1'] = [that.state.num02, that.state.area02, 0, 0];
+      // that.state.data['1'] = [that.state.num02, that.state.area02, 0, 0];
+      that.state.data['11'] = [1, 3.72, '0', '0'];
+      that.state.data['12'] = [5, 18.75, '0', '0'];
       that.state.data['2'] = [that.state.num12, that.state.area12, 0, 0];
       that.state.data['3'] = [that.state.num22, that.state.area22, 0, 0];
       that.state.data['41'] = [7, 20.85, 0, 0];

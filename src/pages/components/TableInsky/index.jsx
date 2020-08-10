@@ -7,12 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Row, Col } from 'antd';
 import styles from './index.less';
-/**
- *
- *
- * @param {*} props
- * @returns
- */
+
 const TableInsky = props => {
   console.log(props.data);
   const { data, date } = props;
@@ -137,8 +132,8 @@ const TableInsky = props => {
           style={{
             borderRight: '0.5px solid white',
             color: 'white',
-            height: 48,
-            lineHeight: '48px',
+            height: 54,
+            lineHeight: '54px',
           }}
         >
           1
@@ -148,47 +143,134 @@ const TableInsky = props => {
           style={{
             borderRight: '0.5px solid white',
             color: 'white',
-            height: 48,
-            lineHeight: '48px',
+            height: 54,
+            lineHeight: '54px',
           }}
         >
-          幕墙面板
+          <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+            <div
+              style={{
+                width: '50%',
+                height: '100%',
+                lineHeight: '54px',
+                borderRightWidth: 0.5,
+                borderRightColor: 'white',
+                borderRightStyle: 'solid',
+              }}
+            >
+              幕墙面板
+            </div>
+            <div style={{ width: '50%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <div
+                style={{
+                  height: '50%',
+                  lineHeight: '27px',
+                  borderBottomWidth: 0.5,
+                  borderBottomColor: 'white',
+                  borderBottomStyle: 'solid',
+                }}
+              >
+                玻璃破损
+              </div>
+              <div style={{ height: '50%', lineHeight: '27px', borderBottomWidth: 0.5 }}>玻璃脱胶</div>
+            </div>
+          </div>
         </div>
         <div
           className={styles.col4}
           style={{
             borderRight: '0.5px solid white',
             color: 'white',
-            height: 48,
-            lineHeight: '48px',
+            height: 54,
+            lineHeight: '54px',
           }}
         >
-          {data['1'][0]}
+          <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <div
+              style={{
+                height: '50%',
+                lineHeight: '27px',
+                borderBottomWidth: 0.5,
+                borderBottomColor: 'white',
+                borderBottomStyle: 'solid',
+              }}
+            >
+              {data['11'][0]}
+            </div> 
+            <div style={{ height: '50%', lineHeight: '27px', borderBottomWidth: 0.5 }}>
+              {data['12'][0]}
+            </div>
+          </div>
         </div>
         <div
           className={styles.col4}
           style={{
             borderRight: '0.5px solid white',
             color: 'white',
-            height: 48,
-            lineHeight: '48px',
+            height: 54,
+            lineHeight: '27px',
           }}
         >
-          {data['1'][1]}
+          <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <div
+              style={{
+                height: '50%',
+                lineHeight: '27px',
+                borderBottomWidth: 0.5,
+                borderBottomColor: 'white',
+                borderBottomStyle: 'solid',
+              }}
+            >
+              {data['11'][1]}
+            </div>
+            <div style={{ height: '50%', lineHeight: '27px', borderBottomWidth: 0.5 }}>
+              {data['12'][1]}
+            </div>
+          </div>
         </div>
         <div
           className={styles.col4}
           style={{
             borderRight: '0.5px solid white',
             color: 'white',
-            height: 48,
-            lineHeight: '48px',
+            height: 54,
+            lineHeight: '54px',
           }}
         >
-          {data['1'][2]}
+          <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <div
+              style={{
+                height: '50%',
+                lineHeight: '27px',
+                borderBottomWidth: 0.5,
+                borderBottomColor: 'white',
+                borderBottomStyle: 'solid',
+              }}
+            >
+              {data['11'][2]}
+            </div>
+            <div style={{ height: '50%', lineHeight: '27px', borderBottomWidth: 0.5 }}>
+              {data['11'][2]}
+            </div>
+          </div>
         </div>
-        <div className={styles.col4} style={{ color: 'white', height: 48, lineHeight: '48px' }}>
-          {data['1'][3]}
+        <div className={styles.col4} style={{ color: 'white', height: 54, lineHeight: '27px' }}>
+          <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <div
+              style={{
+                height: '50%',
+                lineHeight: '27px',
+                borderBottomWidth: 0.5,
+                borderBottomColor: 'white',
+                borderBottomStyle: 'solid',
+              }}
+            >
+              {data['11'][3]}
+            </div>
+            <div style={{ height: '50%', lineHeight: '27px', borderBottomWidth: 0.5 }}>
+              {data['11'][3]}
+            </div>
+          </div>
         </div>
       </div>
       <div
